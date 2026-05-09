@@ -37,3 +37,10 @@ logs/
 # Coverage
 coverage/
 .nyc_output/
+
+# Vite
+.vite/
+node_modules/
+dist/
+build/
+.env*
