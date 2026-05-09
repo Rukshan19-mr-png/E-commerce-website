@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const Product = require('./models/Product');
 const User = require('./models/User');
 const Order = require('./models/Order');
+const { notifyOrderConfirmed, notifyOrderDelivered } = require('./utils/notifications');
 
 // Static data fallbacks
 const staticProducts = require('./data/products');
@@ -241,10 +242,10 @@ app.get('/api/auth/me', async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
   try {
-    const { userEmail, userName, items, total, subtotal, tax, address, paymentMethod, orderType } = req.body;
+    const { userEmail, userName, items, total, subtotal, tax, address, phone, paymentMethod, orderType } = req.body;
 
-    if (!userEmail || !items || total === undefined) {
-      return res.status(400).json({ message: 'Email, items, and total are required.' });
+    if (!userEmail || !items || total === undefined || !phone) {
+      return res.status(400).json({ message: 'Email, items, phone, and total are required.' });
     }
 
     const isPickup = orderType === 'Store Pickup';
@@ -262,8 +263,13 @@ app.post('/api/orders', async (req, res) => {
         address,
         paymentMethod: paymentMethod || 'Cash on Delivery',
         orderType: orderType || 'Home Delivery',
+        phone,
         status: 'pending',
       });
+      
+      // Send Confirmation Notification
+      notifyOrderConfirmed(newOrder).catch(err => console.error('Notification Error:', err));
+
       res.status(201).json({ order: { ...newOrder.toObject(), id: newOrder._id.toString() } });
     } else {
       console.log('Mocking order creation (no DB connection)');
@@ -275,12 +281,17 @@ app.post('/api/orders', async (req, res) => {
         total: finalTotal, 
         shipping: finalShipping,
         tax: tax || 0,
+        phone,
         paymentMethod: paymentMethod || 'Cash on Delivery',
         orderType: orderType || 'Home Delivery',
         status: 'pending', 
         createdAt: new Date() 
       };
       inMemoryOrders.push(mockOrder);
+
+      // Send Mock Confirmation
+      notifyOrderConfirmed(mockOrder).catch(err => console.error('Notification Error:', err));
+
       res.status(201).json({ order: mockOrder });
     }
   } catch (error) {
@@ -345,12 +356,25 @@ app.put('/api/orders/:id/status', async (req, res) => {
       if (!order) return res.status(404).json({ message: 'Order not found' });
       
       order.status = status;
+      if (status === 'packing') order.packedAt = Date.now();
+      if (status === 'shipping') order.shippedAt = Date.now();
+      if (status === 'delivered') order.deliveredAt = Date.now();
       await order.save();
+
+      // Trigger Notification if Delivered
+      if (status === 'delivered') {
+        notifyOrderDelivered(order).catch(err => console.error('Notification Error:', err));
+      }
+
       res.json({ message: 'Order status updated', order });
     } else {
       const order = inMemoryOrders.find(o => o.id === req.params.id);
       if (!order) return res.status(404).json({ message: 'Order not found' });
       order.status = status;
+      if (status === 'delivered') {
+        order.deliveredAt = new Date();
+        notifyOrderDelivered(order).catch(err => console.error('Notification Error:', err));
+      }
       res.json({ message: 'Order status updated (static)', order });
     }
   } catch (error) {
