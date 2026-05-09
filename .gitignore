@@ -43,4 +43,8 @@ coverage/
 node_modules/
 dist/
 build/
-.env*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
