@@ -22,6 +22,7 @@ const Checkout = () => {
     paymentMethod: 'Cash on Delivery',
     orderType: 'Home Delivery',
     branch: '',
+    phone: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -41,6 +42,7 @@ const Checkout = () => {
     if (form.orderType === 'Home Delivery' && !form.address1.trim()) nextErrors.address1 = 'Address line 1 is required.';
     if (form.orderType === 'Home Delivery' && !form.city.trim()) nextErrors.city = 'City is required.';
     if (form.orderType === 'Store Pickup' && !form.branch) nextErrors.branch = 'Please select a branch for pickup.';
+    if (!form.phone.trim() || !/^\d{10}$/.test(form.phone.trim())) nextErrors.phone = 'Valid 10-digit phone number is required.';
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -62,6 +64,7 @@ const Checkout = () => {
         address: form.orderType === 'Store Pickup' 
           ? `Store Pickup at ${form.branch} Branch`
           : `${form.address1}${form.address2 ? ', ' + form.address2 : ''}, ${form.city}, ${form.state} ${form.postalCode}, ${form.country}`,
+        phone: form.phone,
         paymentMethod: form.paymentMethod,
         orderType: form.orderType,
       };
@@ -108,6 +111,7 @@ const Checkout = () => {
         address: form.orderType === 'Store Pickup' 
           ? `Store Pickup at ${form.branch} Branch`
           : `${form.address1}${form.address2 ? ', ' + form.address2 : ''}, ${form.city}, ${form.state} ${form.postalCode}, ${form.country}`,
+        phone: form.phone,
         paymentMethod: 'PayPal',
         orderType: form.orderType,
       };
@@ -171,6 +175,11 @@ const Checkout = () => {
                 <label>Email</label>
                 <input className="form-input" type="email" value={form.email} onChange={(e) => handleChange('email', e.target.value)} />
                 {errors.email && <p className="error-text">{errors.email}</p>}
+              </div>
+              <div className="form-field">
+                <label>Phone Number</label>
+                <input className="form-input" type="tel" value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} placeholder="07XXXXXXXX" />
+                {errors.phone && <p className="error-text">{errors.phone}</p>}
               </div>
 
               <div className="form-field" style={{ marginTop: '1.5rem' }}>
@@ -262,10 +271,22 @@ const Checkout = () => {
                     * Processed as approx. ${(grandTotal * LKR_TO_USD_RATE).toFixed(2)} USD via PayPal
                   </p>
                 </div>
+
+                <div style={{ 
+                  marginBottom: '1.5rem', 
+                  padding: '0.8rem', 
+                  background: '#f1f2f6', 
+                  borderRadius: '10px', 
+                  fontSize: '0.85rem', 
+                  borderLeft: '4px solid var(--primary)' 
+                }}>
+                  💳 <strong>Secure Card Processing:</strong> The <strong>{CURRENCY} {DELIVERY_FEE}</strong> delivery fee and order total will be deducted from your account once you confirm your card details below.
+                </div>
+
                 <PayPalButtons 
                   style={{ layout: 'vertical', color: 'blue', shape: 'pill', label: 'checkout' }}
                   createOrder={(data, actions) => {
-                    if (!validate()) return actions.reject();
+                    if (!validate()) return Promise.reject(new Error('Validation failed'));
                     return actions.order.create({
                       purchase_units: [{
                         amount: {
