@@ -7,12 +7,13 @@ const mongoose = require('mongoose');
 const Product = require('./models/Product');
 const User = require('./models/User');
 const Order = require('./models/Order');
-const { notifyOrderConfirmed, notifyOrderDelivered } = require('./utils/notifications');
+const { notifyOrderConfirmed, notifyOrderDelivered, sendResetCode } = require('./utils/notifications');
 
 // Static data fallbacks
 const staticProducts = require('./data/products');
 const staticUsers = require('./data/users');
 const inMemoryOrders = [];
+const inMemoryResetCodes = {}; // { email: { code, expire } }
 
 dotenv.config();
 
@@ -107,10 +108,22 @@ const DELIVERY_FEE = 250;
 
 app.post('/api/auth/signup', async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, phoneNumber } = req.body;
 
-    if (!name || !email || !password || !role) {
-      return res.status(400).json({ message: 'Name, email, password, and role are required.' });
+    if (!name || !email || !password || !role || !phoneNumber) {
+      return res.status(400).json({ message: 'Name, email, password, role, and phone number are required.' });
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Please enter a valid email address.' });
+    }
+
+    // Phone number validation (Sri Lanka format: +947xxxxxxxx or 07xxxxxxxx)
+    const phoneRegex = /^(?:\+94|0)7[0-9]{8}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      return res.status(400).json({ message: 'Please enter a valid Sri Lankan phone number (e.g. 0771234567).' });
     }
 
     // Role check for staff (seller, manager, delivery)
@@ -126,11 +139,11 @@ app.post('/api/auth/signup', async (req, res) => {
         return res.status(409).json({ message: 'Email already registered.' });
       }
 
-      const user = await User.create({ name, email, password, role });
+      const user = await User.create({ name, email, password, role, phoneNumber });
       res.status(201).json({ user: sanitizeUser(user.toObject()), token: createToken(user) });
     } else {
       console.log('Mocking signup (no DB connection)');
-      const mockUser = { name, email, role, id: 'mock-' + Date.now() };
+      const mockUser = { name, email, role, phoneNumber, id: 'mock-' + Date.now() };
       res.status(201).json({ user: mockUser, token: createToken(mockUser) });
     }
   } catch (error) {
@@ -138,46 +151,95 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 });
 
-// Forgot Password - Send Reset Link
+// Forgot Password - Send Reset Code
 app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
   try {
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const resetCodeExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
     if (isDBConnected()) {
       const user = await User.findOne({ email });
       if (!user) return res.status(404).json({ message: 'No account found with this email.' });
 
-      // Generate a simple token (in real app, use crypto.randomBytes)
-      const resetToken = jwt.sign({ email }, process.env.JWT_SECRET || 'plantopia-secret', { expiresIn: '1h' });
-      
-      // In a real app, send email here. For now, we return it for testing.
-      console.log(`Reset link for ${email}: http://localhost:5173/reset-password/${resetToken}`);
-      res.json({ message: 'Password reset link generated. Check console for the link!' });
+      user.resetCode = resetCode;
+      user.resetCodeExpire = resetCodeExpire;
+      await user.save();
     } else {
-      res.status(400).json({ message: 'Reset password requires a database connection.' });
+      console.log('Mocking forgot-password (no DB connection)');
+      const userExists = staticUsers.find(u => u.email === email);
+      if (!userExists) return res.status(404).json({ message: 'No account found with this email (static).' });
+      
+      inMemoryResetCodes[email] = { code: resetCode, expire: resetCodeExpire };
     }
+
+    // Send Code via Email (Both for DB and Mock)
+    await sendResetCode(email, resetCode);
+    res.json({ message: 'Verification code sent to your email.' });
+    
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: ' + error.message });
+  }
+});
+
+// Verify Reset Code
+app.post('/api/auth/verify-code', async (req, res) => {
+  const { email, code } = req.body;
+  try {
+    if (isDBConnected()) {
+      const user = await User.findOne({ 
+        email,
+        resetCode: code,
+        resetCodeExpire: { $gt: Date.now() }
+      });
+      if (!user) return res.status(400).json({ message: 'Invalid or expired verification code.' });
+    } else {
+      const stored = inMemoryResetCodes[email];
+      if (!stored || stored.code !== code || stored.expire < Date.now()) {
+        return res.status(400).json({ message: 'Invalid or expired verification code (static).' });
+      }
+    }
+    res.json({ message: 'Code verified successfully.' });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }
 });
 
-// Reset Password - Finalize
+// Reset Password - Finalize with Code
 app.post('/api/auth/reset-password', async (req, res) => {
-  const { token, newPassword } = req.body;
+  const { email, code, newPassword } = req.body;
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'plantopia-secret');
-    
     if (isDBConnected()) {
-      const user = await User.findOne({ email: decoded.email });
-      if (!user) return res.status(404).json({ message: 'User not found.' });
+      const user = await User.findOne({ 
+        email,
+        resetCode: code,
+        resetCodeExpire: { $gt: Date.now() }
+      });
+
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid or expired verification code.' });
+      }
 
       user.password = newPassword;
+      user.resetCode = undefined;
+      user.resetCodeExpire = undefined;
       await user.save();
-      res.json({ message: 'Password reset successful! You can now login.' });
     } else {
-      res.status(400).json({ message: 'Reset password requires a database connection.' });
+      const stored = inMemoryResetCodes[email];
+      if (!stored || stored.code !== code || stored.expire < Date.now()) {
+        return res.status(400).json({ message: 'Invalid or expired verification code (static).' });
+      }
+      
+      const user = staticUsers.find(u => u.email === email);
+      if (user) {
+        user.password = bcrypt.hashSync(newPassword, 10);
+      }
+      delete inMemoryResetCodes[email];
     }
+    
+    res.json({ message: 'Password reset successful! You can now login.' });
   } catch (error) {
-    res.status(400).json({ message: 'Invalid or expired reset link.' });
+    res.status(500).json({ message: 'Server Error' });
   }
 });
 
