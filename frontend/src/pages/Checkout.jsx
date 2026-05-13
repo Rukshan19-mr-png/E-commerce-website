@@ -22,7 +22,7 @@ const Checkout = () => {
     paymentMethod: 'Cash on Delivery',
     orderType: 'Home Delivery',
     branch: '',
-    phone: '',
+    phone: auth?.phoneNumber || '',
   });
 
   const [errors, setErrors] = useState({});
@@ -42,7 +42,12 @@ const Checkout = () => {
     if (form.orderType === 'Home Delivery' && !form.address1.trim()) nextErrors.address1 = 'Address line 1 is required.';
     if (form.orderType === 'Home Delivery' && !form.city.trim()) nextErrors.city = 'City is required.';
     if (form.orderType === 'Store Pickup' && !form.branch) nextErrors.branch = 'Please select a branch for pickup.';
-    if (!form.phone.trim() || !/^\d{10}$/.test(form.phone.trim())) nextErrors.phone = 'Valid 10-digit phone number is required.';
+    
+    // Sri Lankan phone number validation regex
+    const phoneRegex = /^(?:\+94|0)7[0-9]{8}$/;
+    if (!form.phone.trim() || !phoneRegex.test(form.phone.trim())) {
+      nextErrors.phone = 'Valid Sri Lankan phone number is required (e.g. 0771234567).';
+    }
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
