@@ -99,7 +99,34 @@ const notifyOrderDelivered = async (order) => {
   await sendSMS(order.phone, message);
 };
 
+/**
+ * Send Password Reset Code
+ */
+const sendResetCode = async (email, code) => {
+  const subject = 'Password Reset Verification Code - Plantopia';
+  const message = `Your password reset verification code is: ${code}. This code will expire in 10 minutes.`;
+  
+  console.log(`[EMAIL MOCK] To ${email}: Verification Code is ${code}`);
+
+  const html = `
+    <div style="font-family: sans-serif; padding: 20px; color: #1b4332; max-width: 500px; margin: auto; border: 1px solid #d8f3dc; border-radius: 12px;">
+      <h2 style="text-align: center; color: #2d6a4f;">Password Reset 🌿</h2>
+      <p>Hello,</p>
+      <p>We received a request to reset your password. Use the verification code below to proceed:</p>
+      <div style="background: #f4fcf6; padding: 20px; text-align: center; font-size: 2rem; font-weight: 800; letter-spacing: 5px; color: #1b4332; border-radius: 8px; margin: 20px 0;">
+        ${code}
+      </div>
+      <p style="font-size: 0.9rem; color: #5c6c5d;">This code will expire in <strong>10 minutes</strong>. If you didn't request this, you can safely ignore this email.</p>
+      <hr style="border: none; border-top: 1px solid #d8f3dc; margin: 20px 0;" />
+      <p style="text-align: center; font-size: 0.8rem; color: #5c6c5d;">Plantopia Sri Lanka - Bring Life to Your Space</p>
+    </div>
+  `;
+
+  await sendEmail(email, subject, message, html);
+};
+
 module.exports = {
   notifyOrderConfirmed,
-  notifyOrderDelivered
+  notifyOrderDelivered,
+  sendResetCode
 };
