@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import ProductGrid from '../components/ProductGrid';
 import { API_BASE } from '../utils/constants';
 
 const Home = () => {
   const [apiMessage, setApiMessage] = useState('Connecting to backend...');
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +24,7 @@ const Home = () => {
 
         if (productsRes.ok) {
           const productsData = await productsRes.json();
-          // Show 4 premium plants on home
+          // Show 8 premium plants on home
           setProducts(productsData.slice(0, 8));
         }
       } catch {
@@ -32,6 +34,13 @@ const Home = () => {
 
     fetchData();
   }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
 
   const features = [
     { icon: '🚚', title: 'Islandwide Delivery', desc: 'Fast and secure delivery across Sri Lanka.' },
@@ -54,20 +63,45 @@ const Home = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
+          style={{ width: '100%', maxWidth: '900px' }}
         >
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
             <span className="badge">Sri Lanka's Finest</span>
             <span className="badge">Established 2024</span>
           </div>
-          <h1 style={{ color: '#fff', fontSize: 'clamp(3rem, 10vw, 6rem)', lineHeight: 1.1, fontWeight: 800 }}>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(3rem, 10vw, 5.5rem)', lineHeight: 1.1, fontWeight: 800 }}>
             Bring Life to <br /> <span style={{ color: 'var(--accent)' }}>Your Space</span>
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.4rem', marginTop: '1.5rem', maxWidth: '700px', margin: '1.5rem auto 2.5rem' }}>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.25rem', marginTop: '1.5rem', maxWidth: '700px', margin: '1.5rem auto 2.5rem' }}>
             Discover a curated collection of exotic Sri Lankan plants, from majestic flowers to organic fruit saplings.
           </p>
+
+          <form onSubmit={handleSearch} style={{ maxWidth: '600px', margin: '0 auto 3rem', position: 'relative' }}>
+            <div className="search-bar-container" style={{ marginBottom: 0, maxWidth: 'none' }}>
+              <div className="search-icon-wrapper">
+                <Search size={22} color="var(--primary)" />
+              </div>
+              <input
+                type="text"
+                className="search-input-field"
+                placeholder="What plant are you looking for?"
+                style={{ padding: '1.4rem 1.5rem 1.4rem 3.8rem', fontSize: '1.2rem', background: 'rgba(255,255,255,0.95)' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button 
+                type="submit" 
+                className="btn-primary" 
+                style={{ position: 'absolute', right: '8px', top: '8px', bottom: '8px', padding: '0 24px', borderRadius: '40px' }}
+              >
+                Search
+              </button>
+            </div>
+          </form>
+
           <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center' }}>
-            <Link to="/shop" className="btn-primary" style={{ padding: '16px 40px', fontSize: '1.1rem' }}>Shop Collection</Link>
-            <Link to="/care" className="btn-secondary" style={{ padding: '16px 40px', fontSize: '1.1rem', background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}>Care Guides</Link>
+            <Link to="/shop" className="btn-secondary" style={{ padding: '14px 32px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}>Browse All</Link>
+            <Link to="/care" className="btn-secondary" style={{ padding: '14px 32px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}>Care Guides</Link>
           </div>
         </motion.div>
       </div>
@@ -83,7 +117,7 @@ const Home = () => {
               key={i} 
               className="category-card"
               whileHover={{ scale: 1.02 }}
-              onClick={() => navigate('/shop')}
+              onClick={() => navigate(`/shop?search=${encodeURIComponent(cat.title.replace(' Plants', ''))}`)}
             >
               <img src={cat.img} alt={cat.title} />
               <div className="category-overlay">
