@@ -1,20 +1,32 @@
-import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { API_BASE } from '../utils/constants';
 
 const ResetPassword = () => {
-  const { token } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  const [email, setEmail] = useState(location.state?.email || '');
+  const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    // If no email is provided (accessed directly), redirect to forgot password
+    if (!email) {
+      navigate('/forgot-password');
+    }
+  }, [email, navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       return setError('Passwords do not match');
+    }
+    if (code.length !== 6) {
+      return setError('Please enter a valid 6-digit code');
     }
 
     setLoading(true);
@@ -24,7 +36,7 @@ const ResetPassword = () => {
       const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword: password }),
+        body: JSON.stringify({ email, code, newPassword: password }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
@@ -53,21 +65,35 @@ const ResetPassword = () => {
         ) : (
           <>
             <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '2rem' }}>
-              Enter your new password below.
+              Enter the 6-digit code sent to <strong>{email}</strong> and your new password.
             </p>
-            {error && <div style={{ background: '#f8d7da', color: '#842029', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{error}</div>}
+            {error && <div style={{ background: '#f8d7da', color: '#842029', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>⚠️ {error}</div>}
             
             <form onSubmit={handleSubmit}>
+              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Verification Code</label>
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="123456"
+                  maxLength={6}
+                  required
+                  className="form-input"
+                  style={{ textAlign: 'center', fontSize: '1.5rem', letterSpacing: '8px' }}
+                />
+              </div>
+
               <div className="form-group" style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>New Password</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="********"
+                  placeholder="Min. 6 characters"
                   required
                   minLength={6}
-                  style={{ width: '100%', padding: '0.8rem', borderRadius: '10px', border: '1px solid #ddd' }}
+                  className="form-input"
                 />
               </div>
               <div className="form-group" style={{ marginBottom: '2rem' }}>
@@ -76,15 +102,23 @@ const ResetPassword = () => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="********"
+                  placeholder="Re-enter password"
                   required
-                  style={{ width: '100%', padding: '0.8rem', borderRadius: '10px', border: '1px solid #ddd' }}
+                  className="form-input"
                 />
               </div>
               <button type="submit" className="btn-primary" style={{ width: '100%', padding: '1rem' }} disabled={loading}>
                 {loading ? 'Updating Password...' : 'Reset Password'}
               </button>
             </form>
+            <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+              <button 
+                onClick={() => navigate('/forgot-password')} 
+                style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.9rem' }}
+              >
+                Didn't receive code? Try again
+              </button>
+            </div>
           </>
         )}
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE } from '../utils/constants';
 
 const ForgotPassword = () => {
@@ -7,6 +7,7 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,6 +25,10 @@ const ForgotPassword = () => {
       if (!res.ok) throw new Error(data.message);
       
       setMessage(data.message);
+      // Navigate to reset password page after a brief delay
+      setTimeout(() => {
+        navigate('/reset-password', { state: { email } });
+      }, 2000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -36,11 +41,15 @@ const ForgotPassword = () => {
       <div className="glass-card" style={{ padding: '3rem', borderRadius: '24px', maxWidth: '450px', width: '100%' }}>
         <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Forgot Password?</h2>
         <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '2rem' }}>
-          Enter your email and we'll send you a link to reset your password.
+          Enter your email and we'll send you a 6-digit verification code to reset your password.
         </p>
 
-        {message && <div style={{ background: '#d1e7dd', color: '#0f5132', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{message}</div>}
-        {error && <div style={{ background: '#f8d7da', color: '#842029', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{error}</div>}
+        {message && (
+          <div style={{ background: 'rgba(45, 106, 79, 0.1)', color: 'var(--primary-dark)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem', border: '1px solid var(--primary-light)' }}>
+            ✅ {message} Redirecting...
+          </div>
+        )}
+        {error && <div style={{ background: '#f8d7da', color: '#842029', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>⚠️ {error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group" style={{ marginBottom: '1.5rem' }}>
@@ -51,11 +60,11 @@ const ForgotPassword = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
               required
-              style={{ width: '100%', padding: '0.8rem', borderRadius: '10px', border: '1px solid #ddd' }}
+              className="form-input"
             />
           </div>
           <button type="submit" className="btn-primary" style={{ width: '100%', padding: '1rem' }} disabled={loading}>
-            {loading ? 'Sending Link...' : 'Send Reset Link'}
+            {loading ? 'Sending Code...' : 'Send Verification Code'}
           </button>
         </form>
 
