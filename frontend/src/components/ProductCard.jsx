@@ -31,7 +31,13 @@ const ProductCard = ({ product, onAddToCart, showAddButton = false }) => {
         {product.countInStock === 0 && (
           <span className="product-card-badge badge-out">Out of Stock</span>
         )}
-        <span className="product-card-category">{product.category}</span>
+        <Link 
+          to={`/shop?category=${encodeURIComponent(product.category)}`} 
+          className="product-card-category"
+          style={{ cursor: 'pointer', zIndex: 5 }}
+        >
+          {product.category}
+        </Link>
       </div>
 
       <div className="product-card-body">
