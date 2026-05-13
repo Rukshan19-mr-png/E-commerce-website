@@ -3,7 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE } from '../utils/constants';
 
 const Signup = () => {
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'user' });
+  const [form, setForm] = useState({ 
+    name: '', 
+    email: '', 
+    phoneNumber: '', 
+    password: '', 
+    confirmPassword: '', 
+    role: 'user' 
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -11,6 +18,20 @@ const Signup = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    // Phone number validation (Sri Lanka format)
+    const phoneRegex = /^(?:\+94|0)7[0-9]{8}$/;
+    if (!phoneRegex.test(form.phoneNumber)) {
+      setError('Please enter a valid Sri Lankan phone number (e.g. 0771234567).');
+      return;
+    }
 
     if (form.password !== form.confirmPassword) {
       setError('Passwords do not match.');
@@ -29,6 +50,7 @@ const Signup = () => {
         body: JSON.stringify({
           name: form.name,
           email: form.email,
+          phoneNumber: form.phoneNumber,
           password: form.password,
           role: form.role,
         }),
@@ -39,7 +61,7 @@ const Signup = () => {
         throw new Error(data.message || 'Signup failed. Please try again.');
       }
 
-      // ✅ Redirect to login page with a success notice — do NOT auto-login
+      // ✅ Redirect to login page with a success notice
       navigate('/login', {
         state: { signupSuccess: true, email: form.email },
       });
@@ -56,7 +78,7 @@ const Signup = () => {
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <span style={{ fontSize: '2.5rem' }}>🌱</span>
           <h2 style={{ marginTop: '0.5rem' }}>Create Account</h2>
-          <p style={{ color: 'var(--text-muted)' }}>Join Plantopia and start your green journey.</p>
+          <p style={{ color: 'rgba(255,255,255,0.8)' }}>Join Plantopia and start your green journey.</p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
@@ -79,6 +101,18 @@ const Signup = () => {
               placeholder="you@example.com"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="form-field">
+            <label>Phone Number</label>
+            <input
+              className="form-input"
+              type="tel"
+              placeholder="e.g. 0771234567"
+              value={form.phoneNumber}
+              onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
               required
             />
           </div>
@@ -134,7 +168,7 @@ const Signup = () => {
           </div>
 
           {error && (
-            <div className="error-text" style={{ background: 'rgba(220,53,69,0.1)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(220,53,69,0.3)' }}>
+            <div className="error-text" style={{ background: 'rgba(220,53,69,0.1)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(220,53,69,0.3)', marginBottom: '1rem' }}>
               ⚠️ {error}
             </div>
           )}
