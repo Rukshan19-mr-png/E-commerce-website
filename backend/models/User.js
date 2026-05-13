@@ -21,6 +21,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: 'user',
     },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    resetCode: String,
+    resetCodeExpire: Date,
   },
   {
     timestamps: true,
