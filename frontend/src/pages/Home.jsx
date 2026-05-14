@@ -50,9 +50,9 @@ const Home = () => {
   ];
 
   const categories = [
-    { title: 'Flower Plants', img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=600' },
-    { title: 'Fruit Plants', img: 'https://images.unsplash.com/photo-1557800636-894a64c1696f?auto=format&fit=crop&q=80&w=600' },
-    { title: 'Other Plants', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&q=80&w=600' },
+    { title: 'Flower Plants', img: '/images/nil_manel.png' },
+    { title: 'Fruit Plants', img: '/images/plants/dragon_fruit.png' },
+    { title: 'Other Plants', img: '/images/plants/money_tree.png' },
   ];
 
   return (
