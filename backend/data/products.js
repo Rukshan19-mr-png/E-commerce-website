@@ -3,11 +3,11 @@ const products = [
   {
     id: '1',
     name: 'Kadupul (Queen of the Night)',
-    image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=800',
+    image: '/images/kadupul.png',
     images: [
-      'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=800',
-      'https://upload.wikimedia.org/wikipedia/commons/1/1a/Epiphyllum_oxypetalum_Flower.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/b/be/Epiphyllum_oxypetalum_2.jpg'
+      '/images/kadupul.png',
+      '/images/plants/kadupul_night.png',
+      'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=800'
     ],
     description: "The world's most expensive and rare flower, blooming only at night. Endemic to Sri Lanka.",
     category: 'Flower Plants',
@@ -20,8 +20,9 @@ const products = [
   {
     id: '2',
     name: 'Vesak Orchid',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
+    image: '/images/vesak_orchid.png',
     images: [
+      '/images/vesak_orchid.png',
       'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
       'https://upload.wikimedia.org/wikipedia/commons/b/ba/Dendrobium_maccarthiae_orchids.jpg'
     ],
@@ -36,8 +37,9 @@ const products = [
   {
     id: '3',
     name: 'Binara (Blue Flower)',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Exacum_trinervium_macranthum_1.jpg/800px-Exacum_trinervium_macranthum_1.jpg',
+    image: '/images/binara.png',
     images: [
+      '/images/binara.png',
       'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Exacum_trinervium_macranthum_1.jpg/800px-Exacum_trinervium_macranthum_1.jpg',
       'https://upload.wikimedia.org/wikipedia/commons/4/4b/Exacum_trinervium.jpg'
     ],
@@ -52,8 +54,9 @@ const products = [
   {
     id: '4',
     name: 'Nil Manel (Blue Water Lily)',
-    image: 'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=800',
+    image: '/images/nil_manel.png',
     images: [
+      '/images/nil_manel.png',
       'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=800',
       'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=800'
     ],
@@ -68,10 +71,11 @@ const products = [
   {
     id: '11',
     name: 'Frangipani (Araliya)',
-    image: 'https://images.unsplash.com/photo-1599933310631-6ef98fdf790f?auto=format&fit=crop&q=80&w=800',
+    image: '/images/plants/frangipani.png',
     images: [
-      'https://images.unsplash.com/photo-1599933310631-6ef98fdf790f?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1616149175402-998845187019?auto=format&fit=crop&q=80&w=800'
+      '/images/plants/frangipani.png',
+      'https://images.unsplash.com/photo-1599933310631-6ef98fdf790f?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1556196148-1fb724238a9a?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Highly fragrant blossoms often found near Sri Lankan temples. Elegant and calming.',
     category: 'Flower Plants',
@@ -84,10 +88,11 @@ const products = [
   {
     id: '12',
     name: 'Hibiscus (Pokuru Wada)',
-    image: 'https://images.unsplash.com/photo-1525310238806-e1903744619d?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-TTaxId0Im2s?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1525310238806-e1903744619d?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1591522026857-41484501a351?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-TTaxId0Im2s?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1525310238806-e1903744619d?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1591522026857-41484501a351?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Large, colorful flowers that thrive in tropical heat. Vibrant red petals.',
     category: 'Flower Plants',
@@ -100,10 +105,11 @@ const products = [
   {
     id: '13',
     name: 'Jasmine (Pichcha)',
-    image: 'https://images.unsplash.com/photo-1595180470559-0f4b301b44ec?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-CTmNS-p9RRo?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1595180470559-0f4b301b44ec?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1600854294022-297c41328905?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-CTmNS-p9RRo?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1595180470559-0f4b301b44ec?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1600854294022-297c41328905?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Intense sweet fragrance with delicate white flowers. Perfect for evening gardens.',
     category: 'Flower Plants',
@@ -114,28 +120,13 @@ const products = [
     wateringFrequency: 'Daily',
   },
   {
-    id: '14',
-    name: 'Anthurium (Premium Red)',
-    image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800',
-    images: [
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=800'
-    ],
-    description: 'Heart-shaped, glossy red spathes. Long-lasting and sophisticated indoor plant.',
-    category: 'Flower Plants',
-    price: 450.00,
-    countInStock: 20,
-    lightRequirement: 'Low Light',
-    petFriendly: false,
-    wateringFrequency: 'Weekly',
-  },
-  {
     id: '15',
     name: 'Bougainvillea (Mixed)',
-    image: 'https://images.unsplash.com/photo-1589133866385-d60f5800d046?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-0vZz7v9bFEA?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1589133866385-d60f5800d046?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1628102431448-971501bc8926?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-0vZz7v9bFEA?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1589133866385-d60f5800d046?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1628102431448-971501bc8926?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'A riot of color with papery bracts. Extremely hardy and drought tolerant.',
     category: 'Flower Plants',
@@ -148,10 +139,11 @@ const products = [
   {
     id: '16',
     name: 'Ixora (Rathmal)',
-    image: 'https://images.unsplash.com/photo-1582234306352-789a74042858?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-yQJlqfm10Bk?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1582234306352-789a74042858?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1616149175402-998845187019?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-yQJlqfm10Bk?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1616149175402-998845187019?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1582234306352-789a74042858?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Dense clusters of small red flowers. Attracts butterflies and birds.',
     category: 'Flower Plants',
@@ -164,10 +156,11 @@ const products = [
   {
     id: '17',
     name: 'Spider Lily',
-    image: 'https://images.unsplash.com/photo-1600705494483-363820297b41?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-LAVBv16GN2A?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1600705494483-363820297b41?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-LAVBv16GN2A?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1600705494483-363820297b41?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Elegant white petals with a spider-like appearance. Striking garden feature.',
     category: 'Flower Plants',
@@ -180,10 +173,11 @@ const products = [
   {
     id: '18',
     name: 'Canna Lily (Orange)',
-    image: 'https://images.unsplash.com/photo-1550948330-b2b589e6ad24?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-7jMFiaKMJBg?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1550948330-b2b589e6ad24?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-7jMFiaKMJBg?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1550948330-b2b589e6ad24?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Broad, tropical foliage with vibrant orange spikes. Water-loving.',
     category: 'Flower Plants',
@@ -194,28 +188,13 @@ const products = [
     wateringFrequency: 'Daily',
   },
   {
-    id: '19',
-    name: 'Marigold (French)',
-    image: 'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&q=80&w=800',
-    images: [
-      'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1597426102283-982185bc72aa?auto=format&fit=crop&q=80&w=800'
-    ],
-    description: 'Cheery yellow and orange flowers. Great for pest control in gardens.',
-    category: 'Flower Plants',
-    price: 120.00,
-    countInStock: 100,
-    lightRequirement: 'Direct Sun',
-    petFriendly: true,
-    wateringFrequency: 'Daily',
-  },
-  {
     id: '20',
     name: 'Zinnia (Profusion)',
-    image: 'https://images.unsplash.com/photo-1563241527-3004b7be0fab?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-ykyGnY3If2w?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1563241527-3004b7be0fab?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-ykyGnY3If2w?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1563241527-3004b7be0fab?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Long-blooming and colorful. Very easy to grow for beginners.',
     category: 'Flower Plants',
@@ -228,10 +207,11 @@ const products = [
   {
     id: '21',
     name: 'Petunia (Galaxy)',
-    image: 'https://images.unsplash.com/photo-1558231533-3d078ba92652?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-n59_r5PjHRg?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1558231533-3d078ba92652?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1615147342761-9238e15d8b96?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-n59_r5PjHRg?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1615147342761-9238e15d8b96?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1558231533-3d078ba92652?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Night sky patterns on purple petals. Extraordinary aesthetic appeal.',
     category: 'Flower Plants',
@@ -242,28 +222,13 @@ const products = [
     wateringFrequency: 'Daily',
   },
   {
-    id: '22',
-    name: 'Periwinkle (Vinca)',
-    image: 'https://images.unsplash.com/photo-1603436326446-74e2d65f3168?auto=format&fit=crop&q=80&w=800',
-    images: [
-      'https://images.unsplash.com/photo-1603436326446-74e2d65f3168?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1582234306352-789a74042858?auto=format&fit=crop&q=80&w=800'
-    ],
-    description: 'Hardy ground cover with delicate lavender flowers. Low maintenance.',
-    category: 'Flower Plants',
-    price: 120.00,
-    countInStock: 80,
-    lightRequirement: 'Direct Sun',
-    petFriendly: false,
-    wateringFrequency: 'Weekly',
-  },
-  {
     id: '23',
     name: 'Garden Rose (White)',
-    image: 'https://images.unsplash.com/photo-1548611635-b6e78eb1d40a?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-CTmNS-p9RRo?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1548611635-b6e78eb1d40a?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1496062031456-07b8f162a322?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-CTmNS-p9RRo?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1548611635-b6e78eb1d40a?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1496062031456-07b8f162a322?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Timeless beauty with multiple layers of white petals. Classic elegance.',
     category: 'Flower Plants',
@@ -276,10 +241,11 @@ const products = [
   {
     id: '24',
     name: 'Clematis (Purple)',
-    image: 'https://images.unsplash.com/photo-1555546200-84c47844005e?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1555546200-84c47844005e?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1555546200-84c47844005e?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1589133866385-d60f5800d046?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-1555546200-84c47844005e?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1589133866385-d60f5800d046?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1603436326446-74e2d65f3168?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Climbing vine with large, dramatic purple blooms. Perfect for fences.',
     category: 'Flower Plants',
@@ -292,10 +258,11 @@ const products = [
   {
     id: '25',
     name: 'Plumeria (Pink)',
-    image: 'https://images.unsplash.com/photo-1599933310631-6ef98fdf790f?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1556196148-1fb724238a9a?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1599933310631-6ef98fdf790f?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1556196148-1fb724238a9a?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-1556196148-1fb724238a9a?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1599933310631-6ef98fdf790f?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1616149175402-998845187019?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Soft pink Plumeria with yellow centers. Tropical paradise vibes.',
     category: 'Flower Plants',
@@ -308,10 +275,11 @@ const products = [
   {
     id: '26',
     name: 'Sunflower (Giant)',
-    image: 'https://images.unsplash.com/photo-1597426102283-982185bc72aa?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=1200',
     images: [
-      'https://images.unsplash.com/photo-1597426102283-982185bc72aa?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1597426102283-982185bc72aa?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&q=80&w=1200'
     ],
     description: 'Tall, majestic sunflowers that follow the sun. Cheerful and bold.',
     category: 'Flower Plants',
@@ -321,6 +289,108 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
+  {
+    id: '39',
+    name: 'Lavender (English)',
+    image: 'https://images.unsplash.com/photo--fdLwPMi7iQ?auto=format&fit=crop&q=80&w=1200',
+    images: [
+      'https://images.unsplash.com/photo--fdLwPMi7iQ?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1595180470559-0f4b301b44ec?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1558231533-3d078ba92652?auto=format&fit=crop&q=80&w=1200'
+    ],
+    description: 'Calming purple blooms with a relaxing scent. Perfect for aromatic gardens.',
+    category: 'Flower Plants',
+    price: 350.00,
+    countInStock: 25,
+    lightRequirement: 'Direct Sun',
+    petFriendly: true,
+    wateringFrequency: 'Weekly',
+  },
+  {
+    id: '40',
+    name: 'Tulip (Red Emperor)',
+    image: 'https://images.unsplash.com/photo-_i9j6XYAW9g?auto=format&fit=crop&q=80&w=1200',
+    images: [
+      'https://images.unsplash.com/photo-_i9j6XYAW9g?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1550948330-b2b589e6ad24?auto=format&fit=crop&q=80&w=1200'
+    ],
+    description: 'Vibrant red petals that signal the start of spring. Bold and elegant.',
+    category: 'Flower Plants',
+    price: 400.00,
+    countInStock: 15,
+    lightRequirement: 'Partial Sun',
+    petFriendly: false,
+    wateringFrequency: 'Daily',
+  },
+  {
+    id: '41',
+    name: 'Orchid (Cattleya)',
+    image: 'https://images.unsplash.com/photo-1554123168-b400f9c804ca?auto=format&fit=crop&q=80&w=1200',
+    images: [
+      'https://images.unsplash.com/photo-1554123168-b400f9c804ca?auto=format&fit=crop&q=80&w=1200',
+      'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/b/ba/Dendrobium_maccarthiae_orchids.jpg'
+    ],
+    description: 'Large, showy flowers with a heavenly fragrance. The queen of orchids.',
+    category: 'Flower Plants',
+    price: 950.00,
+    countInStock: 5,
+    lightRequirement: 'Bright Indirect',
+    petFriendly: true,
+    wateringFrequency: 'Daily',
+  },
+  {
+    id: '14',
+    name: 'Anthurium (Premium Red)',
+    image: 'https://images.unsplash.com/photo-RI8b9HweIc0?auto=format&fit=crop&q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-RI8b9HweIc0?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=800'
+    ],
+    description: 'Heart-shaped, glossy red spathes. Long-lasting and sophisticated indoor plant.',
+    category: 'Flower Plants',
+    price: 450.00,
+    countInStock: 20,
+    lightRequirement: 'Low Light',
+    petFriendly: false,
+    wateringFrequency: 'Weekly',
+  },
+  {
+    id: '19',
+    name: 'Marigold (French)',
+    image: 'https://images.unsplash.com/photo-C2FLN_sOqVw?auto=format&fit=crop&q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-C2FLN_sOqVw?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1597426102283-982185bc72aa?auto=format&fit=crop&q=80&w=800'
+    ],
+    description: 'Cheery yellow and orange flowers. Great for pest control in gardens.',
+    category: 'Flower Plants',
+    price: 120.00,
+    countInStock: 100,
+    lightRequirement: 'Direct Sun',
+    petFriendly: true,
+    wateringFrequency: 'Daily',
+  },
+  {
+    id: '22',
+    name: 'Periwinkle (Vinca)',
+    image: 'https://images.unsplash.com/photo-6SEA1udGsn4?auto=format&fit=crop&q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-6SEA1udGsn4?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1603436326446-74e2d65f3168?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1582234306352-789a74042858?auto=format&fit=crop&q=80&w=800'
+    ],
+    description: 'Hardy ground cover with delicate lavender flowers. Low maintenance.',
+    category: 'Flower Plants',
+    price: 120.00,
+    countInStock: 80,
+    lightRequirement: 'Direct Sun',
+    petFriendly: false,
+    wateringFrequency: 'Weekly',
+  },
 
   // --- Fruit Plants (10 total) ---
   {
@@ -329,7 +399,8 @@ const products = [
     image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=600',
     images: [
       'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=80&w=600'
+      'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&q=80&w=600'
     ],
     description: 'The most famous and delicious mango variety from Sri Lanka.',
     category: 'Fruit Plants',
@@ -361,7 +432,8 @@ const products = [
     image: 'https://images.unsplash.com/photo-1562447470-4f5148386121?auto=format&fit=crop&q=80&w=600',
     images: [
       'https://images.unsplash.com/photo-1562447470-4f5148386121?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600'
+      'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1594911773030-24b52be35824?auto=format&fit=crop&q=80&w=600'
     ],
     description: 'Superior quality Rambutan from the Malwana region. Sweet and crunchy.',
     category: 'Fruit Plants',
@@ -491,7 +563,8 @@ const products = [
     image: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=600',
     images: [
       'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600'
+      'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1523038753396-6fc30403aa67?auto=format&fit=crop&q=80&w=600'
     ],
     description: 'Genuine Sandalwood specimen, divine fragrance and high medicinal value.',
     category: 'Other',
@@ -580,54 +653,6 @@ const products = [
     lightRequirement: 'Low Light',
     petFriendly: true,
     wateringFrequency: 'Weekly',
-  },
-  {
-    id: '39',
-    name: 'Lavender (English)',
-    image: 'https://images.unsplash.com/photo-1595180470559-0f4b301b44ec?auto=format&fit=crop&q=80&w=800',
-    images: [
-      'https://images.unsplash.com/photo-1595180470559-0f4b301b44ec?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1558231533-3d078ba92652?auto=format&fit=crop&q=80&w=800'
-    ],
-    description: 'Calming purple blooms with a relaxing scent. Perfect for aromatic gardens.',
-    category: 'Flower Plants',
-    price: 350.00,
-    countInStock: 25,
-    lightRequirement: 'Direct Sun',
-    petFriendly: true,
-    wateringFrequency: 'Weekly',
-  },
-  {
-    id: '40',
-    name: 'Tulip (Red Emperor)',
-    image: 'https://images.unsplash.com/photo-1550948330-b2b589e6ad24?auto=format&fit=crop&q=80&w=800',
-    images: [
-      'https://images.unsplash.com/photo-1550948330-b2b589e6ad24?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&q=80&w=800'
-    ],
-    description: 'Vibrant red petals that signal the start of spring. Bold and elegant.',
-    category: 'Flower Plants',
-    price: 400.00,
-    countInStock: 15,
-    lightRequirement: 'Partial Sun',
-    petFriendly: false,
-    wateringFrequency: 'Daily',
-  },
-  {
-    id: '41',
-    name: 'Orchid (Cattleya)',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
-    images: [
-      'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/b/ba/Dendrobium_maccarthiae_orchids.jpg'
-    ],
-    description: 'Large, showy flowers with a heavenly fragrance. The queen of orchids.',
-    category: 'Flower Plants',
-    price: 950.00,
-    countInStock: 5,
-    lightRequirement: 'Bright Indirect',
-    petFriendly: true,
-    wateringFrequency: 'Daily',
   },
   {
     id: '42',
@@ -722,6 +747,152 @@ const products = [
     price: 150.00,
     countInStock: 100,
     lightRequirement: 'Low Light',
+    petFriendly: false,
+    wateringFrequency: 'Weekly',
+  },
+  {
+    id: '48',
+    name: 'Blue Poppy (Meconopsis)',
+    image: '/images/plants/blue_poppy.png',
+    images: [
+      '/images/plants/blue_poppy.png',
+      'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1558231533-3d078ba92652?auto=format&fit=crop&q=80&w=800'
+    ],
+    description: 'A rare and stunning Himalayan flower with vibrant sky-blue petals. A true collector\'s item.',
+    category: 'Flower Plants',
+    price: 850.00,
+    countInStock: 5,
+    lightRequirement: 'Partial Sun',
+    petFriendly: true,
+    wateringFrequency: 'Daily',
+  },
+  {
+    id: '49',
+    name: 'Bird of Paradise',
+    image: '/images/plants/bird_of_paradise.png',
+    images: ['/images/plants/bird_of_paradise.png'],
+    description: 'An exotic tropical plant known for its unique orange and blue flowers that resemble a bird in flight.',
+    category: 'Flower Plants',
+    price: 550.00,
+    countInStock: 10,
+    lightRequirement: 'Direct Sun',
+    petFriendly: false,
+    wateringFrequency: 'Weekly',
+  },
+  {
+    id: '50',
+    name: 'Dragon Fruit (Pitaya)',
+    image: '/images/plants/dragon_fruit.png',
+    images: [
+      '/images/plants/dragon_fruit.png',
+      'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1630441662104-206774673891?auto=format&fit=crop&q=80&w=600'
+    ],
+    description: 'A stunning cactus plant that produces vibrant pink fruit with a refreshing, sweet taste.',
+    category: 'Fruit Plants',
+    price: 450.00,
+    countInStock: 15,
+    lightRequirement: 'Direct Sun',
+    petFriendly: true,
+    wateringFrequency: 'Weekly',
+  },
+  {
+    id: '51',
+    name: 'Cherry Blossom (Sakura)',
+    image: '/images/plants/cherry_blossom.png',
+    images: ['/images/plants/cherry_blossom.png'],
+    description: 'Iconic spring-blooming tree with delicate pink blossoms. Brings a serene beauty to any garden.',
+    category: 'Flower Plants',
+    price: 950.00,
+    countInStock: 3,
+    lightRequirement: 'Direct Sun',
+    petFriendly: true,
+    wateringFrequency: 'Weekly',
+  },
+  {
+    id: '52',
+    name: 'Money Tree',
+    image: '/images/plants/money_tree.png',
+    images: [
+      '/images/plants/money_tree.png',
+      'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600'
+    ],
+    description: 'Features a beautifully braided trunk and lush green foliage. Believed to bring good luck and prosperity.',
+    category: 'Other',
+    price: 480.00,
+    countInStock: 20,
+    lightRequirement: 'Bright Indirect',
+    petFriendly: true,
+    wateringFrequency: 'Weekly',
+  },
+  {
+    id: '53',
+    name: 'ZZ Plant',
+    image: '/images/plants/zz_plant.png',
+    images: ['/images/plants/zz_plant.png'],
+    description: 'Extremely hardy indoor plant with glossy, waxy leaves. Perfect for low-light environments.',
+    category: 'Other',
+    price: 280.00,
+    countInStock: 25,
+    lightRequirement: 'Low Light',
+    petFriendly: false,
+    wateringFrequency: 'Monthly',
+  },
+  {
+    id: '54',
+    name: 'King Protea',
+    image: 'https://images.unsplash.com/photo-2q9mA1DuYtw?auto=format&fit=crop&q=80&w=800',
+    images: ['https://images.unsplash.com/photo-2q9mA1DuYtw?auto=format&fit=crop&q=80&w=800'],
+    description: 'Massive, dramatic blooms with a prehistoric look. The national flower of South Africa.',
+    category: 'Flower Plants',
+    price: 750.00,
+    countInStock: 8,
+    lightRequirement: 'Direct Sun',
+    petFriendly: true,
+    wateringFrequency: 'Weekly',
+  },
+  {
+    id: '55',
+    name: 'Passion Fruit',
+    image: 'https://images.unsplash.com/photo-1594911773030-24b52be35824?auto=format&fit=crop&q=80&w=600',
+    images: ['https://images.unsplash.com/photo-1594911773030-24b52be35824?auto=format&fit=crop&q=80&w=600'],
+    description: 'A vigorous climbing vine that produces fragrant flowers and delicious, tangy tropical fruit.',
+    category: 'Fruit Plants',
+    price: 320.00,
+    countInStock: 12,
+    lightRequirement: 'Direct Sun',
+    petFriendly: true,
+    wateringFrequency: 'Daily',
+  },
+  {
+    id: '56',
+    name: 'Lychee Tree',
+    image: 'https://images.unsplash.com/photo-1628102431448-971501bc8926?auto=format&fit=crop&q=80&w=600',
+    images: ['https://images.unsplash.com/photo-1628102431448-971501bc8926?auto=format&fit=crop&q=80&w=600'],
+    description: 'Evergreen tree producing clusters of sweet, aromatic fruit with a translucent flesh.',
+    category: 'Fruit Plants',
+    price: 650.00,
+    countInStock: 6,
+    lightRequirement: 'Direct Sun',
+    petFriendly: true,
+    wateringFrequency: 'Weekly',
+  },
+  {
+    id: '57',
+    name: 'Rubber Plant (Burgundy)',
+    image: 'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1509423350716-97f9360b4e09?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600'
+    ],
+    description: 'Striking indoor plant with deep burgundy, glossy leaves. Bold and easy to care for.',
+    category: 'Other',
+    price: 420.00,
+    countInStock: 18,
+    lightRequirement: 'Bright Indirect',
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
