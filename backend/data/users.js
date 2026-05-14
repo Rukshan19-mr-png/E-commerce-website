@@ -6,6 +6,7 @@ const users = [
     email: 'abeywardenamr@gmail.com',
     password: bcrypt.hashSync('password123', 10),
     role: 'manager',
+    phoneNumber: '+94712345678',
     id: 'manager-001',
   },
   {
@@ -13,6 +14,7 @@ const users = [
     email: 'maleesharukshan19@gmail.com',
     password: bcrypt.hashSync('password123', 10),
     role: 'manager',
+    phoneNumber: '+94712345679',
     id: 'manager-002',
   },
   {
@@ -20,6 +22,7 @@ const users = [
     email: 'john@example.com',
     password: bcrypt.hashSync('password123', 10),
     role: 'user',
+    phoneNumber: '+94712345680',
     id: 'user-001',
   },
   {
@@ -27,6 +30,7 @@ const users = [
     email: 'jane@example.com',
     password: bcrypt.hashSync('password123', 10),
     role: 'user',
+    phoneNumber: '+94712345681',
     id: 'user-002',
   },
 ];
