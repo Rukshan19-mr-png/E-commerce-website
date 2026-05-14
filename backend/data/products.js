@@ -3,9 +3,8 @@ const products = [
   {
     id: '1',
     name: 'Kadupul (Queen of the Night)',
-    image: '/images/kadupul.png',
+    image: '/images/plants/kadupul_night.png',
     images: [
-      '/images/kadupul.png',
       '/images/plants/kadupul_night.png',
       'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=800'
     ],
@@ -20,9 +19,8 @@ const products = [
   {
     id: '2',
     name: 'Vesak Orchid',
-    image: '/images/vesak_orchid.png',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
     images: [
-      '/images/vesak_orchid.png',
       'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
       'https://upload.wikimedia.org/wikipedia/commons/b/ba/Dendrobium_maccarthiae_orchids.jpg'
     ],
@@ -37,11 +35,10 @@ const products = [
   {
     id: '3',
     name: 'Binara (Blue Flower)',
-    image: '/images/binara.png',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Exacum_trinervium.jpg',
     images: [
-      '/images/binara.png',
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Exacum_trinervium_macranthum_1.jpg/800px-Exacum_trinervium_macranthum_1.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/4/4b/Exacum_trinervium.jpg'
+      'https://upload.wikimedia.org/wikipedia/commons/4/4b/Exacum_trinervium.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Exacum_trinervium_macranthum_1.jpg/800px-Exacum_trinervium_macranthum_1.jpg'
     ],
     description: 'A stunning endemic wildflower with vibrant blue petals, found in the misty highlands.',
     category: 'Flower Plants',
@@ -54,9 +51,8 @@ const products = [
   {
     id: '4',
     name: 'Nil Manel (Blue Water Lily)',
-    image: '/images/nil_manel.png',
+    image: 'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=800',
     images: [
-      '/images/nil_manel.png',
       'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=800',
       'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=800'
     ],

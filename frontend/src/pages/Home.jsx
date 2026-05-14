@@ -50,7 +50,7 @@ const Home = () => {
   ];
 
   const categories = [
-    { title: 'Flower Plants', img: '/images/nil_manel.png' },
+    { title: 'Flower Plants', img: 'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=800' },
     { title: 'Fruit Plants', img: '/images/plants/dragon_fruit.png' },
     { title: 'Other Plants', img: '/images/plants/money_tree.png' },
   ];
