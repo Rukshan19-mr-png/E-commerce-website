@@ -6,7 +6,7 @@ const ProductCard = ({ product, onAddToCart, showAddButton = false }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  const fallbackImg = 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&q=80&w=400';
+  const fallbackImg = 'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?auto=format&fit=crop&q=80&w=400';
 
   return (
     <div className="product-card glass-card">
