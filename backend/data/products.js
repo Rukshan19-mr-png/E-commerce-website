@@ -1,13 +1,9 @@
 const products = [
   // --- Flower Plants (20 total) ---
-  {
-    id: '1',
+  { id: '1',
     name: 'Kadupul (Queen of the Night)',
-    image: '/images/plants/kadupul_night.png',
-    images: [
-      '/images/plants/kadupul_night.png',
-      'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=800'
-    ],
+    image: '/images/plants/kadupul.jpg',
+    images: ['/images/plants/kadupul.jpg'],
     description: "The world's most expensive and rare flower, blooming only at night. Endemic to Sri Lanka.",
     category: 'Flower Plants',
     price: 1250.00,
@@ -16,14 +12,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '2',
+  { id: '2',
     name: 'Vesak Orchid',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
-    images: [
-      'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/b/ba/Dendrobium_maccarthiae_orchids.jpg'
-    ],
+    image: '/images/plants/vesak-orchid.jpg',
+    images: ['/images/plants/vesak-orchid.jpg'],
     description: 'A rare endemic orchid from Sri Lankan rainforests. Highly valued for its soft purple blooms.',
     category: 'Flower Plants',
     price: 850.00,
@@ -32,14 +24,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '3',
+  { id: '3',
     name: 'Binara (Blue Flower)',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Exacum_trinervium.jpg',
-    images: [
-      'https://upload.wikimedia.org/wikipedia/commons/4/4b/Exacum_trinervium.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Exacum_trinervium_macranthum_1.jpg/800px-Exacum_trinervium_macranthum_1.jpg'
-    ],
+    image: '/images/plants/binara-blue-flower.jpg',
+    images: ['/images/plants/binara-blue-flower.jpg'],
     description: 'A stunning endemic wildflower with vibrant blue petals, found in the misty highlands.',
     category: 'Flower Plants',
     price: 450.00,
@@ -48,14 +36,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '4',
+  { id: '4',
     name: 'Nil Manel (Blue Water Lily)',
-    image: 'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=800',
-    images: [
-      'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=800'
-    ],
+    image: '/images/plants/nil-manel.jpg',
+    images: ['/images/plants/nil-manel.jpg'],
     description: "Sri Lanka's national flower, symbolizing purity. A premium aquatic plant.",
     category: 'Flower Plants',
     price: 350.00,
@@ -64,15 +48,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '11',
+  { id: '11',
     name: 'Frangipani (Araliya)',
-    image: '/images/plants/frangipani.png',
-    images: [
-      '/images/plants/frangipani.png',
-      'https://images.unsplash.com/photo-1599933310631-6ef98fdf790f?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1556196148-1fb724238a9a?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/frangipani.jpg',
+    images: ['/images/plants/frangipani.jpg'],
     description: 'Highly fragrant blossoms often found near Sri Lankan temples. Elegant and calming.',
     category: 'Flower Plants',
     price: 650.00,
@@ -81,15 +60,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '12',
+  { id: '12',
     name: 'Hibiscus (Pokuru Wada)',
-    image: 'https://images.unsplash.com/photo-TTaxId0Im2s?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-TTaxId0Im2s?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1525310238806-e1903744619d?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1591522026857-41484501a351?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/hibiscus.jpg',
+    images: ['/images/plants/hibiscus.jpg'],
     description: 'Large, colorful flowers that thrive in tropical heat. Vibrant red petals.',
     category: 'Flower Plants',
     price: 220.00,
@@ -98,15 +72,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '13',
+  { id: '13',
     name: 'Jasmine (Pichcha)',
-    image: 'https://images.unsplash.com/photo-CTmNS-p9RRo?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-CTmNS-p9RRo?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1595180470559-0f4b301b44ec?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1600854294022-297c41328905?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/jasmine.jpg',
+    images: ['/images/plants/jasmine.jpg'],
     description: 'Intense sweet fragrance with delicate white flowers. Perfect for evening gardens.',
     category: 'Flower Plants',
     price: 180.00,
@@ -115,15 +84,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '15',
+  { id: '15',
     name: 'Bougainvillea (Mixed)',
-    image: 'https://images.unsplash.com/photo-0vZz7v9bFEA?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-0vZz7v9bFEA?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1589133866385-d60f5800d046?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1628102431448-971501bc8926?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/bougainvillea.jpg',
+    images: ['/images/plants/bougainvillea.jpg'],
     description: 'A riot of color with papery bracts. Extremely hardy and drought tolerant.',
     category: 'Flower Plants',
     price: 320.00,
@@ -132,15 +96,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '16',
+  { id: '16',
     name: 'Ixora (Rathmal)',
-    image: 'https://images.unsplash.com/photo-yQJlqfm10Bk?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-yQJlqfm10Bk?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1616149175402-998845187019?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1582234306352-789a74042858?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/ixora.jpg',
+    images: ['/images/plants/ixora.jpg'],
     description: 'Dense clusters of small red flowers. Attracts butterflies and birds.',
     category: 'Flower Plants',
     price: 150.00,
@@ -149,15 +108,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '17',
+  { id: '17',
     name: 'Spider Lily',
-    image: 'https://images.unsplash.com/photo-LAVBv16GN2A?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-LAVBv16GN2A?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1600705494483-363820297b41?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/spider-lily.jpg',
+    images: ['/images/plants/spider-lily.jpg'],
     description: 'Elegant white petals with a spider-like appearance. Striking garden feature.',
     category: 'Flower Plants',
     price: 280.00,
@@ -166,15 +120,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '18',
+  { id: '18',
     name: 'Canna Lily (Orange)',
-    image: 'https://images.unsplash.com/photo-7jMFiaKMJBg?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-7jMFiaKMJBg?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1550948330-b2b589e6ad24?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/canna-lily.jpg',
+    images: ['/images/plants/canna-lily.jpg'],
     description: 'Broad, tropical foliage with vibrant orange spikes. Water-loving.',
     category: 'Flower Plants',
     price: 320.00,
@@ -183,15 +132,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '20',
+  { id: '20',
     name: 'Zinnia (Profusion)',
-    image: 'https://images.unsplash.com/photo-ykyGnY3If2w?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-ykyGnY3If2w?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1563241527-3004b7be0fab?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/zinnia.jpg',
+    images: ['/images/plants/zinnia.jpg'],
     description: 'Long-blooming and colorful. Very easy to grow for beginners.',
     category: 'Flower Plants',
     price: 150.00,
@@ -200,15 +144,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '21',
+  { id: '21',
     name: 'Petunia (Galaxy)',
-    image: 'https://images.unsplash.com/photo-n59_r5PjHRg?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-n59_r5PjHRg?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1615147342761-9238e15d8b96?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1558231533-3d078ba92652?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/petunia.jpg',
+    images: ['/images/plants/petunia.jpg'],
     description: 'Night sky patterns on purple petals. Extraordinary aesthetic appeal.',
     category: 'Flower Plants',
     price: 450.00,
@@ -217,15 +156,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '23',
+  { id: '23',
     name: 'Garden Rose (White)',
-    image: 'https://images.unsplash.com/photo-CTmNS-p9RRo?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-CTmNS-p9RRo?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1548611635-b6e78eb1d40a?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1496062031456-07b8f162a322?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/garden-rose.jpg',
+    images: ['/images/plants/garden-rose.jpg'],
     description: 'Timeless beauty with multiple layers of white petals. Classic elegance.',
     category: 'Flower Plants',
     price: 450.00,
@@ -234,15 +168,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '24',
+  { id: '24',
     name: 'Clematis (Purple)',
-    image: 'https://images.unsplash.com/photo-1555546200-84c47844005e?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-1555546200-84c47844005e?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1589133866385-d60f5800d046?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1603436326446-74e2d65f3168?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/clematis.jpg',
+    images: ['/images/plants/clematis.jpg'],
     description: 'Climbing vine with large, dramatic purple blooms. Perfect for fences.',
     category: 'Flower Plants',
     price: 550.00,
@@ -251,15 +180,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '25',
+  { id: '25',
     name: 'Plumeria (Pink)',
-    image: 'https://images.unsplash.com/photo-1556196148-1fb724238a9a?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-1556196148-1fb724238a9a?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1599933310631-6ef98fdf790f?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1616149175402-998845187019?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/plumeria.jpg',
+    images: ['/images/plants/plumeria.jpg'],
     description: 'Soft pink Plumeria with yellow centers. Tropical paradise vibes.',
     category: 'Flower Plants',
     price: 750.00,
@@ -268,15 +192,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '26',
+  { id: '26',
     name: 'Sunflower (Giant)',
-    image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1597426102283-982185bc72aa?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/sunflower.jpg',
+    images: ['/images/plants/sunflower.jpg'],
     description: 'Tall, majestic sunflowers that follow the sun. Cheerful and bold.',
     category: 'Flower Plants',
     price: 250.00,
@@ -285,15 +204,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '39',
+  { id: '39',
     name: 'Lavender (English)',
-    image: 'https://images.unsplash.com/photo--fdLwPMi7iQ?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo--fdLwPMi7iQ?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1595180470559-0f4b301b44ec?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1558231533-3d078ba92652?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/lavender.jpg',
+    images: ['/images/plants/lavender.jpg'],
     description: 'Calming purple blooms with a relaxing scent. Perfect for aromatic gardens.',
     category: 'Flower Plants',
     price: 350.00,
@@ -302,15 +216,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '40',
+  { id: '40',
     name: 'Tulip (Red Emperor)',
-    image: 'https://images.unsplash.com/photo-_i9j6XYAW9g?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-_i9j6XYAW9g?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1550948330-b2b589e6ad24?auto=format&fit=crop&q=80&w=1200'
-    ],
+    image: '/images/plants/tulip.jpg',
+    images: ['/images/plants/tulip.jpg'],
     description: 'Vibrant red petals that signal the start of spring. Bold and elegant.',
     category: 'Flower Plants',
     price: 400.00,
@@ -319,15 +228,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '41',
+  { id: '41',
     name: 'Orchid (Cattleya)',
-    image: 'https://images.unsplash.com/photo-1554123168-b400f9c804ca?auto=format&fit=crop&q=80&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-1554123168-b400f9c804ca?auto=format&fit=crop&q=80&w=1200',
-      'https://upload.wikimedia.org/wikipedia/commons/e/e4/Dendrobium_maccarthiae.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/b/ba/Dendrobium_maccarthiae_orchids.jpg'
-    ],
+    image: '/images/plants/orchid-cattleya.jpg',
+    images: ['/images/plants/orchid-cattleya.jpg'],
     description: 'Large, showy flowers with a heavenly fragrance. The queen of orchids.',
     category: 'Flower Plants',
     price: 950.00,
@@ -336,15 +240,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '14',
+  { id: '14',
     name: 'Anthurium (Premium Red)',
-    image: 'https://images.unsplash.com/photo-RI8b9HweIc0?auto=format&fit=crop&q=80&w=800',
-    images: [
-      'https://images.unsplash.com/photo-RI8b9HweIc0?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=800'
-    ],
+    image: '/images/plants/anthurium.jpg',
+    images: ['/images/plants/anthurium.jpg'],
     description: 'Heart-shaped, glossy red spathes. Long-lasting and sophisticated indoor plant.',
     category: 'Flower Plants',
     price: 450.00,
@@ -353,15 +252,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '19',
+  { id: '19',
     name: 'Marigold (French)',
-    image: 'https://images.unsplash.com/photo-C2FLN_sOqVw?auto=format&fit=crop&q=80&w=800',
-    images: [
-      'https://images.unsplash.com/photo-C2FLN_sOqVw?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1597426102283-982185bc72aa?auto=format&fit=crop&q=80&w=800'
-    ],
+    image: '/images/plants/marigold.jpg',
+    images: ['/images/plants/marigold.jpg'],
     description: 'Cheery yellow and orange flowers. Great for pest control in gardens.',
     category: 'Flower Plants',
     price: 120.00,
@@ -370,15 +264,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '22',
+  { id: '22',
     name: 'Periwinkle (Vinca)',
-    image: 'https://images.unsplash.com/photo-6SEA1udGsn4?auto=format&fit=crop&q=80&w=800',
-    images: [
-      'https://images.unsplash.com/photo-6SEA1udGsn4?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1603436326446-74e2d65f3168?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1582234306352-789a74042858?auto=format&fit=crop&q=80&w=800'
-    ],
+    image: '/images/plants/periwinkle.jpg',
+    images: ['/images/plants/periwinkle.jpg'],
     description: 'Hardy ground cover with delicate lavender flowers. Low maintenance.',
     category: 'Flower Plants',
     price: 120.00,
@@ -389,15 +278,22 @@ const products = [
   },
 
   // --- Fruit Plants (10 total) ---
-  {
-    id: '7',
+  { id: '52',
+    name: 'King Protea',
+    image: '/images/plants/money-tree.jpg',
+    images: ['/images/plants/money-tree.jpg'],
+    description: 'The national flower of South Africa. Features a massive flower head.',
+    category: 'Flower Plants',
+    price: 1200.00,
+    countInStock: 8,
+    lightRequirement: 'Direct Sun',
+    petFriendly: true,
+    wateringFrequency: 'Weekly',
+  },
+  { id: '7',
     name: 'Ceylon Mango',
-    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/ceylon-mango.jpg',
+    images: ['/images/plants/ceylon-mango.jpg'],
     description: 'The most famous and delicious mango variety from Sri Lanka.',
     category: 'Fruit Plants',
     price: 450.00,
@@ -406,14 +302,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '8',
+  { id: '8',
     name: 'Mangosteen',
-    image: 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1562447470-4f5148386121?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/mangosteen.jpg',
+    images: ['/images/plants/mangosteen.jpg'],
     description: "Known as the 'Queen of Fruits', sweet and tangy tropical fruit.",
     category: 'Fruit Plants',
     price: 650.00,
@@ -422,15 +314,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '9',
+  { id: '9',
     name: 'Malwana Rambutan',
-    image: 'https://images.unsplash.com/photo-1562447470-4f5148386121?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1562447470-4f5148386121?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1594911773030-24b52be35824?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/malwana-rambutan.jpg',
+    images: ['/images/plants/malwana-rambutan.jpg'],
     description: 'Superior quality Rambutan from the Malwana region. Sweet and crunchy.',
     category: 'Fruit Plants',
     price: 550.00,
@@ -439,14 +326,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '27',
+  { id: '27',
     name: 'Sri Lankan Papaya',
-    image: 'https://images.unsplash.com/photo-1610132827033-c15d56352344?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1610132827033-c15d56352344?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1528825831138-d73644919d88?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/sri-lankan-papaya.jpg',
+    images: ['/images/plants/sri-lankan-papaya.jpg'],
     description: 'Fast-growing dwarf papaya. Produces sweet, red-fleshed fruit.',
     category: 'Fruit Plants',
     price: 320.00,
@@ -455,14 +338,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '28',
+  { id: '28',
     name: 'Guava (Bangkok)',
-    image: 'https://images.unsplash.com/photo-1536592248564-9a4f4795738b?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1536592248564-9a4f4795738b?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1628102431448-971501bc8926?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/guava.jpg',
+    images: ['/images/plants/guava.jpg'],
     description: 'Large, seedless guava variety. Crunchy and rich in Vitamin C.',
     category: 'Fruit Plants',
     price: 280.00,
@@ -471,14 +350,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '29',
+  { id: '29',
     name: 'Pomegranate (Red)',
-    image: 'https://images.unsplash.com/photo-1590159746766-07757969ec6d?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1590159746766-07757969ec6d?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/pomegranate.jpg',
+    images: ['/images/plants/pomegranate.jpg'],
     description: 'Rich in antioxidants. Vibrant red fruit with juicy arils.',
     category: 'Fruit Plants',
     price: 650.00,
@@ -487,14 +362,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '30',
+  { id: '30',
     name: 'Starfruit (Kamaranka)',
-    image: 'https://images.unsplash.com/photo-1541484197-40c21323e20e?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1541484197-40c21323e20e?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/starfruit.jpg',
+    images: ['/images/plants/starfruit.jpg'],
     description: 'Exotic star-shaped fruit. Sweet and sour profile, very ornamental.',
     category: 'Fruit Plants',
     price: 350.00,
@@ -503,14 +374,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '31',
+  { id: '31',
     name: 'Soursop (Anoda)',
-    image: 'https://images.unsplash.com/photo-1630441662104-206774673891?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1630441662104-206774673891?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1562447470-4f5148386121?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/soursop.jpg',
+    images: ['/images/plants/soursop.jpg'],
     description: 'Famous for its medicinal properties. Creamy white pulp.',
     category: 'Fruit Plants',
     price: 480.00,
@@ -519,14 +386,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '32',
+  { id: '32',
     name: 'Avocado (Butter)',
-    image: 'https://images.unsplash.com/photo-1523038753396-6fc30403aa67?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1523038753396-6fc30403aa67?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/avocado.jpg',
+    images: ['/images/plants/avocado.jpg'],
     description: 'Rich, buttery avocado variety. Grafted for faster fruiting.',
     category: 'Fruit Plants',
     price: 850.00,
@@ -535,14 +398,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '33',
+  { id: '33',
     name: 'Water Apple (Jambu)',
-    image: 'https://images.unsplash.com/photo-1594911773030-24b52be35824?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1594911773030-24b52be35824?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1525310238806-e1903744619d?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/water-apple.jpg',
+    images: ['/images/plants/water-apple.jpg'],
     description: 'Refreshing bell-shaped fruits. Very productive and ornamental.',
     category: 'Fruit Plants',
     price: 250.00,
@@ -553,15 +412,10 @@ const products = [
   },
 
   // --- Other Section ---
-  {
-    id: '5',
+  { id: '5',
     name: 'Sri Lankan Sandalwood',
-    image: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1523038753396-6fc30403aa67?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/sri-lankan-sandalwood.jpg',
+    images: ['/images/plants/sri-lankan-sandalwood.jpg'],
     description: 'Genuine Sandalwood specimen, divine fragrance and high medicinal value.',
     category: 'Other',
     price: 1500.00,
@@ -570,14 +424,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Monthly',
   },
-  {
-    id: '34',
+  { id: '34',
     name: 'Monstera Deliciosa',
-    image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/monstera.jpg',
+    images: ['/images/plants/monstera.jpg'],
     description: 'The iconic Swiss Cheese plant. Dramatic foliage for a modern garden.',
     category: 'Other',
     price: 650.00,
@@ -586,14 +436,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '35',
+  { id: '35',
     name: 'Fiddle Leaf Fig',
-    image: 'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/fiddle-leaf-fig.jpg',
+    images: ['/images/plants/fiddle-leaf-fig.jpg'],
     description: 'Large, violin-shaped leaves. A premium statement plant for your home.',
     category: 'Other',
     price: 850.00,
@@ -602,14 +448,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '36',
+  { id: '36',
     name: 'Snake Plant (Sansevieria)',
-    image: 'https://images.unsplash.com/photo-1593482892290-f54927ae1bf6?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1593482892290-f54927ae1bf6?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/snake-plant.jpg',
+    images: ['/images/plants/snake-plant.jpg'],
     description: 'Indestructible and air-purifying. Perfect architectural form.',
     category: 'Other',
     price: 250.00,
@@ -618,14 +460,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Monthly',
   },
-  {
-    id: '37',
+  { id: '37',
     name: 'Areca Palm (Golden Cane)',
-    image: 'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/areca-palm.jpg',
+    images: ['/images/plants/areca-palm.jpg'],
     description: 'Feathery fronds that create a tropical screen. Very graceful.',
     category: 'Other',
     price: 450.00,
@@ -634,14 +472,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '38',
+  { id: '38',
     name: 'Calathea Orbifolia',
-    image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/calathea-orbifolia.jpg',
+    images: ['/images/plants/calathea-orbifolia.jpg'],
     description: 'Large round leaves with silver stripes. A stunning prayer plant.',
     category: 'Other',
     price: 550.00,
@@ -650,14 +484,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '42',
+  { id: '42',
     name: 'Meyer Lemon',
-    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/meyer-lemon.jpg',
+    images: ['/images/plants/meyer-lemon.jpg'],
     description: 'Sweet and tangy lemons from a compact tree. Great for patios.',
     category: 'Fruit Plants',
     price: 550.00,
@@ -666,14 +496,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '43',
+  { id: '43',
     name: 'Blueberry (Duke)',
-    image: 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1562447470-4f5148386121?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/blueberry.jpg',
+    images: ['/images/plants/blueberry.jpg'],
     description: 'Clusters of sweet, antioxidant-rich berries. Thrives in acidic soil.',
     category: 'Fruit Plants',
     price: 480.00,
@@ -682,14 +508,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '44',
+  { id: '44',
     name: 'Dwarf Banana (Ambul)',
-    image: 'https://images.unsplash.com/photo-1610132827033-c15d56352344?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1610132827033-c15d56352344?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1528825831138-d73644919d88?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/dwarf-banana.jpg',
+    images: ['/images/plants/dwarf-banana.jpg'],
     description: 'A smaller banana variety that produces sweet, flavorful fruit.',
     category: 'Fruit Plants',
     price: 380.00,
@@ -698,14 +520,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '45',
+  { id: '45',
     name: 'Aloe Vera (Barbadensis)',
-    image: 'https://images.unsplash.com/photo-1593482892290-f54927ae1bf6?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1593482892290-f54927ae1bf6?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/aloe-vera.jpg',
+    images: ['/images/plants/aloe-vera.jpg'],
     description: 'Fleshy leaves with healing gel. A must-have for every home.',
     category: 'Other',
     price: 220.00,
@@ -714,14 +532,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Monthly',
   },
-  {
-    id: '46',
+  { id: '46',
     name: 'Boston Fern',
-    image: 'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/boston-fern.jpg',
+    images: ['/images/plants/boston-fern.jpg'],
     description: 'Lush, feathery fronds that purify the air. Loves humidity.',
     category: 'Other',
     price: 320.00,
@@ -730,14 +544,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '47',
+  { id: '47',
     name: 'Lucky Bamboo',
-    image: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/lucky-bamboo.jpg',
+    images: ['/images/plants/lucky-bamboo.jpg'],
     description: 'Easy-to-grow stalks that bring good luck. Thrives in water or soil.',
     category: 'Other',
     price: 150.00,
@@ -746,15 +556,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '48',
+  { id: '48',
     name: 'Blue Poppy (Meconopsis)',
-    image: '/images/plants/blue_poppy.png',
-    images: [
-      '/images/plants/blue_poppy.png',
-      'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1558231533-3d078ba92652?auto=format&fit=crop&q=80&w=800'
-    ],
+    image: '/images/plants/blue-poppy.jpg',
+    images: ['/images/plants/blue-poppy.jpg'],
     description: 'A rare and stunning Himalayan flower with vibrant sky-blue petals. A true collector\'s item.',
     category: 'Flower Plants',
     price: 850.00,
@@ -763,11 +568,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '49',
+  { id: '49',
     name: 'Bird of Paradise',
-    image: '/images/plants/bird_of_paradise.png',
-    images: ['/images/plants/bird_of_paradise.png'],
+    image: '/images/plants/bird-of-paradise.jpg',
+    images: ['/images/plants/bird-of-paradise.jpg'],
     description: 'An exotic tropical plant known for its unique orange and blue flowers that resemble a bird in flight.',
     category: 'Flower Plants',
     price: 550.00,
@@ -776,15 +580,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '50',
+  { id: '50',
     name: 'Dragon Fruit (Pitaya)',
-    image: '/images/plants/dragon_fruit.png',
-    images: [
-      '/images/plants/dragon_fruit.png',
-      'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1630441662104-206774673891?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/dragon-fruit.jpg',
+    images: ['/images/plants/dragon-fruit.jpg'],
     description: 'A stunning cactus plant that produces vibrant pink fruit with a refreshing, sweet taste.',
     category: 'Fruit Plants',
     price: 450.00,
@@ -793,11 +592,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '51',
+  { id: '51',
     name: 'Cherry Blossom (Sakura)',
-    image: '/images/plants/cherry_blossom.png',
-    images: ['/images/plants/cherry_blossom.png'],
+    image: '/images/plants/cherry-blossom.jpg',
+    images: ['/images/plants/cherry-blossom.jpg'],
     description: 'Iconic spring-blooming tree with delicate pink blossoms. Brings a serene beauty to any garden.',
     category: 'Flower Plants',
     price: 950.00,
@@ -806,15 +604,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '52',
+  { id: '52',
     name: 'Money Tree',
-    image: '/images/plants/money_tree.png',
-    images: [
-      '/images/plants/money_tree.png',
-      'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1512428813824-f713c2448406?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '',
+    images: [],
     description: 'Features a beautifully braided trunk and lush green foliage. Believed to bring good luck and prosperity.',
     category: 'Other',
     price: 480.00,
@@ -823,11 +616,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '53',
+  { id: '53',
     name: 'ZZ Plant',
-    image: '/images/plants/zz_plant.png',
-    images: ['/images/plants/zz_plant.png'],
+    image: '/images/plants/zz-plant.jpg',
+    images: ['/images/plants/zz-plant.jpg'],
     description: 'Extremely hardy indoor plant with glossy, waxy leaves. Perfect for low-light environments.',
     category: 'Other',
     price: 280.00,
@@ -836,11 +628,10 @@ const products = [
     petFriendly: false,
     wateringFrequency: 'Monthly',
   },
-  {
-    id: '54',
+  { id: '54',
     name: 'King Protea',
-    image: 'https://images.unsplash.com/photo-2q9mA1DuYtw?auto=format&fit=crop&q=80&w=800',
-    images: ['https://images.unsplash.com/photo-2q9mA1DuYtw?auto=format&fit=crop&q=80&w=800'],
+    image: '/images/plants/king-protea.jpg',
+    images: ['/images/plants/king-protea.jpg'],
     description: 'Massive, dramatic blooms with a prehistoric look. The national flower of South Africa.',
     category: 'Flower Plants',
     price: 750.00,
@@ -849,11 +640,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '55',
+  { id: '55',
     name: 'Passion Fruit',
-    image: 'https://images.unsplash.com/photo-1594911773030-24b52be35824?auto=format&fit=crop&q=80&w=600',
-    images: ['https://images.unsplash.com/photo-1594911773030-24b52be35824?auto=format&fit=crop&q=80&w=600'],
+    image: '/images/plants/passion-fruit.jpg',
+    images: ['/images/plants/passion-fruit.jpg'],
     description: 'A vigorous climbing vine that produces fragrant flowers and delicious, tangy tropical fruit.',
     category: 'Fruit Plants',
     price: 320.00,
@@ -862,11 +652,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Daily',
   },
-  {
-    id: '56',
+  { id: '56',
     name: 'Lychee Tree',
-    image: 'https://images.unsplash.com/photo-1628102431448-971501bc8926?auto=format&fit=crop&q=80&w=600',
-    images: ['https://images.unsplash.com/photo-1628102431448-971501bc8926?auto=format&fit=crop&q=80&w=600'],
+    image: '/images/plants/lychee-tree.jpg',
+    images: ['/images/plants/lychee-tree.jpg'],
     description: 'Evergreen tree producing clusters of sweet, aromatic fruit with a translucent flesh.',
     category: 'Fruit Plants',
     price: 650.00,
@@ -875,15 +664,10 @@ const products = [
     petFriendly: true,
     wateringFrequency: 'Weekly',
   },
-  {
-    id: '57',
+  { id: '57',
     name: 'Rubber Plant (Burgundy)',
-    image: 'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1509423350716-97f9360b4e09?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600'
-    ],
+    image: '/images/plants/rubber-plant.jpg',
+    images: ['/images/plants/rubber-plant.jpg'],
     description: 'Striking indoor plant with deep burgundy, glossy leaves. Bold and easy to care for.',
     category: 'Other',
     price: 420.00,
