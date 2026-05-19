@@ -1,6 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+
+// Load env vars FIRST before anything else
+dotenv.config();
+
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
@@ -15,16 +19,29 @@ const staticUsers = require('./data/users');
 const inMemoryOrders = [];
 const inMemoryResetCodes = {}; // { email: { code, expire } }
 
-dotenv.config();
-
 const connectDB = require('./config/db').default;
 connectDB();
 
 const app = express();
 
+// Build allowed origins from env var (comma-separated) + always include localhost for dev
+const productionOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : [];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  ...productionOrigins,
+];
+
 app.disable('x-powered-by');
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: Origin ${origin} not allowed`));
+  },
   credentials: true,
   optionsSuccessStatus: 200,
 }));
@@ -37,12 +54,28 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
+  // Build dynamic CSP that includes production domain if set
+  const productionFrontend = process.env.ALLOWED_ORIGINS || '';
+  const productionBackend = process.env.BACKEND_URL || '';
+  const connectSrc = [
+    "'self'",
+    'http://localhost:5000',
+    'http://localhost:5173',
+    'https://www.paypal.com',
+    'https://api.paypal.com',
+    'https://sandbox.payhere.lk',
+    'https://www.payhere.lk',
+    ...(productionFrontend ? productionFrontend.split(',').map(o => o.trim()) : []),
+    ...(productionBackend ? [productionBackend] : []),
+  ].join(' ');
+
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
   res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; connect-src 'self' http://localhost:5000 http://localhost:5173 https://sandbox.payhere.lk https://www.payhere.lk; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://www.payhere.lk https://sandbox.payhere.lk; frame-src https://sandbox.payhere.lk https://www.payhere.lk; frame-ancestors 'none';");
+  res.setHeader('Content-Security-Policy',
+    `default-src 'self'; connect-src ${connectSrc}; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://www.paypal.com https://www.payhere.lk https://sandbox.payhere.lk; frame-src https://www.paypal.com https://sandbox.payhere.lk https://www.payhere.lk; frame-ancestors 'none';`);
   next();
 });
 
@@ -143,8 +176,16 @@ app.post('/api/auth/signup', async (req, res) => {
       res.status(201).json({ user: sanitizeUser(user.toObject()), token: createToken(user) });
     } else {
       console.log('Mocking signup (no DB connection)');
-      const mockUser = { name, email, role, phoneNumber, id: 'mock-' + Date.now() };
-      res.status(201).json({ user: mockUser, token: createToken(mockUser) });
+      const existingUser = staticUsers.find(u => u.email === email);
+      if (existingUser) {
+        return res.status(409).json({ message: 'Email already registered in static data.' });
+      }
+      
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      const mockUser = { name, email, role, phoneNumber, password: hashedPassword, id: 'mock-' + Date.now() };
+      staticUsers.push(mockUser);
+      
+      res.status(201).json({ user: sanitizeUser(mockUser), token: createToken(mockUser) });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
