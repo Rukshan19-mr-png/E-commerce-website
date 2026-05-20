@@ -5,6 +5,7 @@ import { API_BASE } from '../utils/constants';
 const ManagerDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
+  const [stockInputs, setStockInputs] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(null);
@@ -25,6 +26,12 @@ const ManagerDashboard = () => {
         
         setOrders(ordersData.orders || []);
         setProducts(productsData || []);
+        setStockInputs(
+          (productsData || []).reduce((acc, product) => {
+            acc[product.id] = product.countInStock;
+            return acc;
+          }, {})
+        );
       } catch (err) {
         setError(err.message);
       } finally {
@@ -36,6 +43,12 @@ const ManagerDashboard = () => {
   }, [auth]);
 
   const handleUpdateStock = async (id, newStock) => {
+    const parsedStock = parseInt(newStock, 10);
+    if (Number.isNaN(parsedStock) || parsedStock < 0) {
+      alert('Please provide a valid stock value.');
+      return;
+    }
+
     setUpdating(id);
     try {
       const res = await fetch(`${API_BASE}/api/products/${id}/stock`, {
@@ -44,11 +57,12 @@ const ManagerDashboard = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${auth.token}`,
         },
-        body: JSON.stringify({ countInStock: parseInt(newStock) }),
+        body: JSON.stringify({ countInStock: parsedStock }),
       });
 
       if (res.ok) {
-        setProducts(prev => prev.map(p => p.id === id ? { ...p, countInStock: parseInt(newStock) } : p));
+        setProducts(prev => prev.map(p => p.id === id ? { ...p, countInStock: parsedStock } : p));
+        setStockInputs(prev => ({ ...prev, [id]: parsedStock }));
         alert('Stock updated successfully!');
       } else {
         alert('Failed to update stock');
@@ -104,17 +118,17 @@ const ManagerDashboard = () => {
                   <p style={{ fontWeight: 700, margin: 0 }}>{product.name}</p>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Stock: {product.countInStock}</p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <input 
-                    type="number" 
-                    defaultValue={product.countInStock} 
-                    id={`stock-${product.id}`}
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <input
+                    type="number"
+                    value={stockInputs[product.id] ?? product.countInStock}
+                    onChange={(e) => setStockInputs((prev) => ({ ...prev, [product.id]: e.target.value }))}
                     style={{ width: '70px', padding: '6px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)' }}
                   />
-                  <button 
-                    className="btn-primary" 
+                  <button
+                    className="btn-primary"
                     style={{ padding: '6px 12px', fontSize: '0.8rem' }}
-                    onClick={() => handleUpdateStock(product.id, document.getElementById(`stock-${product.id}`).value)}
+                    onClick={() => handleUpdateStock(product.id, stockInputs[product.id])}
                     disabled={updating === product.id}
                   >
                     Update
