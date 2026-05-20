@@ -5,7 +5,8 @@ import { API_BASE } from '../utils/constants';
 const ResetPassword = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [email, setEmail] = useState(location.state?.email || '');
+  const storedEmail = sessionStorage.getItem('plantopiaResetEmail');
+  const [email, setEmail] = useState(location.state?.email || storedEmail || '');
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,7 +15,6 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    // If no email is provided (accessed directly), redirect to forgot password
     if (!email) {
       navigate('/forgot-password');
     }
@@ -22,11 +22,17 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      return setError('Passwords do not match');
+    if (!email) {
+      return setError('Email is missing. Please start from the forgot password page.');
     }
-    if (code.length !== 6) {
-      return setError('Please enter a valid 6-digit code');
+    if (password.length < 6) {
+      return setError('Password must be at least 6 characters long.');
+    }
+    if (password !== confirmPassword) {
+      return setError('Passwords do not match.');
+    }
+    if (!/^[0-9]{6}$/.test(code)) {
+      return setError('Please enter a valid 6-digit code.');
     }
 
     setLoading(true);
@@ -42,6 +48,7 @@ const ResetPassword = () => {
       if (!res.ok) throw new Error(data.message);
       
       setSuccess(true);
+      sessionStorage.removeItem('plantopiaResetEmail');
       setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
       setError(err.message);
