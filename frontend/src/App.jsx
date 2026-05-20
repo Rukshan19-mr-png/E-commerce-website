@@ -21,6 +21,7 @@ import ResetPassword from './pages/ResetPassword';
 import ManagerDashboard from './pages/ManagerDashboard';
 import Delivery from './pages/Delivery';
 import CareGuides from './pages/CareGuides';
+import NotFound from './pages/NotFound';
 
 const App = () => {
   const { auth } = useAuth();
@@ -38,7 +39,7 @@ const App = () => {
           <Route path="/login" element={auth ? <Navigate to="/dashboard" replace /> : <Login />} />
           <Route path="/signup" element={auth ? <Navigate to="/dashboard" replace /> : <Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
@@ -58,7 +59,7 @@ const App = () => {
             </ProtectedRoute>
           } />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
