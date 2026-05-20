@@ -25,6 +25,7 @@ const ForgotPassword = () => {
       if (!res.ok) throw new Error(data.message);
       
       setMessage(data.message);
+      sessionStorage.setItem('plantopiaResetEmail', email);
       // Navigate to reset password page after a brief delay
       setTimeout(() => {
         navigate('/reset-password', { state: { email } });
