@@ -65,9 +65,10 @@ const Home = () => {
           transition={{ duration: 0.8 }}
           style={{ width: '100%', maxWidth: '900px' }}
         >
-          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
             <span className="badge">Sri Lanka's Finest</span>
             <span className="badge">Established 2024</span>
+            <span className="badge" style={{ background: apiMessage.includes('Connecting') ? 'rgba(231, 76, 60, 0.2)' : 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff' }}>{apiMessage}</span>
           </div>
           <h1 style={{ color: '#fff', fontSize: 'clamp(3rem, 10vw, 5.5rem)', lineHeight: 1.1, fontWeight: 800 }}>
             Bring Life to <br /> <span style={{ color: 'var(--accent)' }}>Your Space</span>
