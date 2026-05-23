@@ -6,7 +6,7 @@ const ResetPassword = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const storedEmail = sessionStorage.getItem('plantopiaResetEmail');
-  const [email, setEmail] = useState(location.state?.email || storedEmail || '');
+  const email = location.state?.email || storedEmail || '';
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

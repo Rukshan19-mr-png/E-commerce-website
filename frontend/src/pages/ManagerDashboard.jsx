@@ -67,7 +67,7 @@ const ManagerDashboard = () => {
       } else {
         alert('Failed to update stock');
       }
-    } catch (err) {
+    } catch {
       alert('Error updating stock');
     } finally {
       setUpdating(null);
@@ -75,6 +75,14 @@ const ManagerDashboard = () => {
   };
 
   const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+
+  if (loading) {
+    return <div className="container" style={{ padding: '4rem 1rem' }}><p>Loading dashboard...</p></div>;
+  }
+
+  if (error) {
+    return <div className="container" style={{ padding: '4rem 1rem' }}><p style={{ color: 'red' }}>Error: {error}</p></div>;
+  }
 
   return (
     <div className="container" style={{ padding: '4rem 1rem' }}>
