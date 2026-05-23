@@ -4,29 +4,36 @@ import { API_BASE, CURRENCY } from '../utils/constants';
 
 const Delivery = () => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { auth } = useAuth();
+  const [loading, setLoading] = useState(() => !!auth?.token);
+  const [error, setError] = useState(null);
+
+  const [prevAuthToken, setPrevAuthToken] = useState(auth?.token);
+  if (auth?.token !== prevAuthToken) {
+    setPrevAuthToken(auth?.token);
+    setLoading(!!auth?.token);
+  }
 
   useEffect(() => {
-    fetchOrders();
-  }, [auth]);
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/orders`, {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
+        if (!res.ok) throw new Error('Failed to load orders');
+        const data = await res.json();
+        setOrders(data.orders || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchOrders = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/orders`, {
-        headers: { Authorization: `Bearer ${auth.token}` },
-      });
-      if (!res.ok) throw new Error('Failed to load orders');
-      const data = await res.json();
-      // Only show orders that are not delivered yet for delivery personnel
-      setOrders(data.orders || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (auth?.token) {
+      fetchOrders();
     }
-  };
+  }, [auth]);
 
   const updateStatus = async (orderId, newStatus) => {
     try {
