@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const crypto = require('crypto');
 
 // Load env vars FIRST before anything else
 dotenv.config();
@@ -46,6 +47,7 @@ app.use(cors({
   optionsSuccessStatus: 200,
 }));
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -410,11 +412,12 @@ app.put('/api/orders/:id/pay', async (req, res) => {
       if (order) {
         order.isPaid = true;
         order.paidAt = Date.now();
+        order.status = 'paid';
         order.paymentResult = {
-          id: req.body.id,
-          status: req.body.status,
-          update_time: req.body.update_time,
-          email_address: req.body.payer.email_address,
+          id: req.body.id || 'payhere-tr-' + Date.now(),
+          status: req.body.status || 'completed',
+          update_time: req.body.update_time || new Date().toISOString(),
+          email_address: req.body.payer?.email_address || '',
         };
         const updatedOrder = await order.save();
         res.json(updatedOrder);
@@ -434,6 +437,79 @@ app.put('/api/orders/:id/pay', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// PayHere Secure Instant Payment Notification (IPN) callback
+app.post('/api/payments/payhere-notify', async (req, res) => {
+  const {
+    merchant_id,
+    order_id,
+    payment_id,
+    payhere_amount,
+    payhere_currency,
+    status_code,
+    md5sig
+  } = req.body;
+
+  const localMerchantId = process.env.PAYHERE_MERCHANT_ID || '1211149';
+  if (merchant_id !== localMerchantId) {
+    return res.status(400).send('Invalid merchant ID');
+  }
+
+  // Verify PayHere MD5 Signature if Merchant Secret is configured
+  const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET || '';
+  if (merchantSecret) {
+    const hashedSecret = crypto.createHash('md5').update(merchantSecret).digest('hex').toUpperCase();
+    const hashString = merchant_id + order_id + payhere_amount + payhere_currency + status_code + hashedSecret;
+    const localMd5 = crypto.createHash('md5').update(hashString).digest('hex').toUpperCase();
+
+    if (localMd5 !== md5sig) {
+      return res.status(400).send('Invalid signature');
+    }
+  }
+
+  try {
+    const isSuccess = status_code === '2' || status_code === 2;
+
+    if (isDBConnected()) {
+      const order = await Order.findById(order_id);
+      if (order) {
+        if (isSuccess) {
+          order.isPaid = true;
+          order.paidAt = Date.now();
+          order.status = 'paid';
+          order.paymentResult = {
+            id: payment_id,
+            status: 'completed',
+            update_time: new Date().toISOString(),
+          };
+          await order.save();
+          // Trigger Confirmation Notification
+          notifyOrderConfirmed(order).catch(err => console.error('Notification Error:', err));
+        } else {
+          order.status = 'failed';
+          await order.save();
+        }
+      }
+    } else {
+      const order = inMemoryOrders.find(o => o.id === order_id);
+      if (order) {
+        if (isSuccess) {
+          order.isPaid = true;
+          order.paidAt = new Date();
+          order.status = 'paid';
+          // Trigger Notification
+          notifyOrderConfirmed(order).catch(err => console.error('Notification Error:', err));
+        } else {
+          order.status = 'failed';
+        }
+      }
+    }
+
+    res.send('OK');
+  } catch (error) {
+    res.status(500).send('Server Error: ' + error.message);
   }
 });
 
@@ -485,8 +561,11 @@ app.put('/api/orders/:id/status', async (req, res) => {
   }
 });
 
-app.get('/api/config/paypal', (req, res) => {
-  res.send(process.env.PAYPAL_CLIENT_ID || 'sb'); // 'sb' for sandbox fallback
+app.get('/api/config/payhere', (req, res) => {
+  res.json({
+    merchantId: process.env.PAYHERE_MERCHANT_ID || '1211149',
+    sandbox: process.env.NODE_ENV !== 'production'
+  });
 });
 
 
