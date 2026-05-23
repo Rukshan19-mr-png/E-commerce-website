@@ -37,11 +37,18 @@ const Shop = () => {
     fetchProducts();
   }, []);
 
-  // Sync state with URL query parameters
-  useEffect(() => {
+  // Sync state with URL query parameters during render to avoid cascading useEffect renders
+  const [prevQuerySearch, setPrevQuerySearch] = useState(querySearch);
+  const [prevQueryCategory, setPrevQueryCategory] = useState(queryCategory);
+
+  if (querySearch !== prevQuerySearch) {
     setSearchTerm(querySearch);
+    setPrevQuerySearch(querySearch);
+  }
+  if (queryCategory !== prevQueryCategory) {
     setActiveCategory(queryCategory);
-  }, [querySearch, queryCategory]);
+    setPrevQueryCategory(queryCategory);
+  }
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = activeCategory === 'All' || product.category === activeCategory;
