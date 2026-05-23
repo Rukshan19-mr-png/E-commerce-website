@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE, DELIVERY_FEE, LKR_TO_USD_RATE, CURRENCY } from '../utils/constants';
-import { PayPalButtons } from '@paypal/react-paypal-js';
+import { API_BASE, DELIVERY_FEE, CURRENCY } from '../utils/constants';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -53,10 +52,80 @@ const Checkout = () => {
     return Object.keys(nextErrors).length === 0;
   };
 
+  const handlePayHerePayment = async (order, merchantId) => {
+    const nameParts = form.fullName.trim().split(' ');
+    const firstName = nameParts[0] || 'Customer';
+    const lastName = nameParts.slice(1).join(' ') || 'Name';
+
+    const paymentDetails = {
+      sandbox: true,
+      merchant_id: merchantId || '1211149',
+      return_url: `${window.location.origin}/success`,
+      cancel_url: `${window.location.origin}/checkout`,
+      notify_url: `${API_BASE}/api/payments/payhere-notify`,
+      order_id: order.id || order._id,
+      items: `Order #${(order.id || order._id).slice(-8).toUpperCase()}`,
+      amount: grandTotal.toFixed(2),
+      currency: 'LKR',
+      first_name: firstName,
+      last_name: lastName,
+      email: form.email,
+      phone: form.phone,
+      address: form.orderType === 'Store Pickup' ? 'Store Pickup' : form.address1,
+      city: form.orderType === 'Store Pickup' ? 'Kadawatha' : form.city,
+      country: 'Sri Lanka'
+    };
+
+    window.payhere.onCompleted = async function onCompleted(orderId) {
+      try {
+        const res = await fetch(`${API_BASE}/api/orders/${orderId}/pay`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${auth?.token}`
+          },
+          body: JSON.stringify({
+            id: 'payhere-tr-' + Date.now(),
+            status: 'completed',
+          })
+        });
+
+        if (!res.ok) throw new Error('Failed to update order payment');
+
+        clearCart();
+        navigate('/success', {
+          state: {
+            fullName: form.fullName,
+            email: form.email,
+            total: grandTotal,
+            paymentMethod: 'PayHere Online',
+            isPaid: true
+          },
+        });
+      } catch {
+        setErrors({ submit: 'Payment successful but status sync failed. Please contact support.' });
+        setSubmitting(false);
+      }
+    };
+
+    window.payhere.onDismissed = function onDismissed() {
+      setErrors({ submit: 'Payment was cancelled or dismissed.' });
+      setSubmitting(false);
+    };
+
+    window.payhere.onError = function onError(error) {
+      setErrors({ submit: `Payment gateway error: ${error}` });
+      setSubmitting(false);
+    };
+
+    window.payhere.startPayment(paymentDetails);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
+    setErrors({});
 
     try {
       const orderData = {
@@ -87,76 +156,35 @@ const Checkout = () => {
         throw new Error('Failed to place order');
       }
 
-      clearCart();
-      navigate('/success', {
-        state: {
-          fullName: form.fullName,
-          email: form.email,
-          total: grandTotal,
-          paymentMethod: form.paymentMethod,
-        },
-      });
+      const data = await response.json();
+      const order = data.order;
+
+      if (form.paymentMethod !== 'Online Payment') {
+        clearCart();
+        navigate('/success', {
+          state: {
+            fullName: form.fullName,
+            email: form.email,
+            total: grandTotal,
+            paymentMethod: form.paymentMethod,
+          },
+        });
+      } else {
+        // Online Payment with PayHere
+        let merchantId = '1211149';
+        try {
+          const configRes = await fetch(`${API_BASE}/api/config/payhere`);
+          if (configRes.ok) {
+            const configData = await configRes.json();
+            merchantId = configData.merchantId;
+          }
+        } catch {
+          // ignore config error, use sandbox fallback
+        }
+        await handlePayHerePayment(order, merchantId);
+      }
     } catch {
       setErrors({ submit: 'Failed to place order. Please try again.' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handlePayPalSuccess = async (details, data) => {
-    setSubmitting(true);
-    try {
-      const orderData = {
-        userEmail: form.email,
-        userName: form.fullName,
-        items: cart,
-        total: cartTotal, 
-        subtotal: cartTotal,
-        tax: 0,
-        address: form.orderType === 'Store Pickup' 
-          ? `Store Pickup at ${form.branch} Branch`
-          : `${form.address1}${form.address2 ? ', ' + form.address2 : ''}, ${form.city}, ${form.state} ${form.postalCode}, ${form.country}`,
-        phone: form.phone,
-        paymentMethod: 'PayPal',
-        orderType: form.orderType,
-      };
-
-      // 1. Create the order
-      const res = await fetch(`${API_BASE}/api/orders`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth?.token}`
-        },
-        body: JSON.stringify(orderData),
-      });
-
-      if (!res.ok) throw new Error('Failed to create order');
-      const { order } = await res.json();
-
-      // 2. Mark as paid
-      await fetch(`${API_BASE}/api/orders/${order.id}/pay`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth?.token}`
-        },
-        body: JSON.stringify(details),
-      });
-
-      clearCart();
-      navigate('/success', {
-        state: {
-          fullName: form.fullName,
-          email: form.email,
-          total: grandTotal,
-          paymentMethod: 'PayPal',
-          isPaid: true
-        },
-      });
-    } catch (err) {
-      setErrors({ submit: 'Payment successful but order creation failed. Please contact support.' });
-    } finally {
       setSubmitting(false);
     }
   };
@@ -259,81 +287,27 @@ const Checkout = () => {
             
             {errors.submit && <p className="error-text" style={{ marginBottom: '1rem' }}>{errors.submit}</p>}
             
-            {form.paymentMethod === 'Online Payment' ? (
-              <div style={{ marginTop: '1rem' }}>
-                <div style={{ 
-                  background: 'rgba(45, 106, 79, 0.05)', 
-                  padding: '1rem', 
-                  borderRadius: '12px', 
-                  marginBottom: '1rem', 
-                  border: '1px solid rgba(45, 106, 79, 0.1)' 
-                }}>
-                  <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>Total to Pay:</p>
-                  <p style={{ margin: '0.25rem 0', fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>
-                    {CURRENCY} {grandTotal.toLocaleString()}
-                  </p>
-                  <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.7, fontStyle: 'italic' }}>
-                    * Processed as approx. ${(grandTotal * LKR_TO_USD_RATE).toFixed(2)} USD via PayPal
-                  </p>
-                </div>
-
-                <div style={{ 
-                  marginBottom: '1.5rem', 
-                  padding: '0.8rem', 
-                  background: '#f1f2f6', 
-                  borderRadius: '10px', 
-                  fontSize: '0.85rem', 
-                  borderLeft: '4px solid var(--primary)' 
-                }}>
-                  💳 <strong>Secure Card Processing:</strong> The <strong>{CURRENCY} {DELIVERY_FEE}</strong> delivery fee and order total will be deducted from your account once you confirm your card details below.
-                </div>
-
-                <PayPalButtons 
-                  style={{ layout: 'vertical', color: 'blue', shape: 'pill', label: 'checkout' }}
-                  createOrder={(data, actions) => {
-                    if (!validate()) return Promise.reject(new Error('Validation failed'));
-                    return actions.order.create({
-                      purchase_units: [{
-                        amount: {
-                          currency_code: 'USD',
-                          value: (grandTotal * LKR_TO_USD_RATE).toFixed(2), 
-                        },
-                        description: `Plantopia Order - ${form.fullName}`,
-                        shipping: {
-                          name: {
-                            full_name: form.fullName
-                          },
-                          address: {
-                            address_line_1: form.address1 || 'Branch Pickup',
-                            address_line_2: form.address2 || '',
-                            admin_area_2: form.city || 'Colombo',
-                            admin_area_1: form.state || '',
-                            postal_code: form.postalCode || '00000',
-                            country_code: 'LK'
-                          }
-                        }
-                      }],
-                      application_context: {
-                        shipping_preference: 'SET_PROVIDED_ADDRESS',
-                        brand_name: 'Plantopia Sri Lanka',
-                      }
-                    });
-                  }}
-                  onApprove={(data, actions) => {
-                    return actions.order.capture().then((details) => {
-                      handlePayPalSuccess(details, data);
-                    });
-                  }}
-                  onError={(err) => {
-                    setErrors({ submit: 'PayPal Checkout failed. Please try again.' });
-                  }}
-                />
+            {form.paymentMethod === 'Online Payment' && (
+              <div style={{ 
+                background: 'rgba(45, 106, 79, 0.05)', 
+                padding: '1rem', 
+                borderRadius: '12px', 
+                marginBottom: '1rem', 
+                border: '1px solid rgba(45, 106, 79, 0.1)' 
+              }}>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>Total to Pay:</p>
+                <p style={{ margin: '0.25rem 0', fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>
+                  {CURRENCY} {grandTotal.toLocaleString()}
+                </p>
+                <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.9, lineHeight: '1.4' }}>
+                  💳 Secure checkout via <strong>PayHere</strong> (supports local Cards, Genie, eZ Cash, mCash & Internet Banking).
+                </p>
               </div>
-            ) : (
-              <button type="submit" className="btn-primary checkout-submit" disabled={submitting} style={{ width: '100%', padding: '1rem' }}>
-                {submitting ? 'Processing...' : 'Place Order'}
-              </button>
             )}
+
+            <button type="submit" className="btn-primary checkout-submit" disabled={submitting} style={{ width: '100%', padding: '1rem' }}>
+              {submitting ? 'Processing...' : (form.paymentMethod === 'Online Payment' ? 'Pay with PayHere' : 'Place Order')}
+            </button>
           </aside>
         </form>
       )}
