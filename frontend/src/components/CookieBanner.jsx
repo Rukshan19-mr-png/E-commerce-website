@@ -1,14 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const CookieBanner = () => {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const consent = localStorage.getItem('plantopiaCookieConsent');
-    if (!consent) {
-      setShow(true);
+  const [show, setShow] = useState(() => {
+    // Check if we are running in browser context
+    if (typeof window !== 'undefined') {
+      return !localStorage.getItem('plantopiaCookieConsent');
     }
-  }, []);
+    return false;
+  });
 
   const handleAccept = () => {
     localStorage.setItem('plantopiaCookieConsent', 'accepted');
