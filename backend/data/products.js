@@ -750,7 +750,7 @@ const products = [
     "wateringFrequency": "Weekly"
   },
   {
-    "id": "52",
+    "id": "58",
     "name": "Money Tree",
     "image": "/images/plants/money-tree.jpg",
     "images": [
