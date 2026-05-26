@@ -358,6 +358,24 @@ app.post('/api/orders', async (req, res) => {
     const finalTotal = total + finalShipping;
 
     if (isDBConnected()) {
+      // 1. Verify Stock
+      for (const item of items) {
+        const product = await Product.findById(item.id);
+        if (!product) {
+          return res.status(404).json({ message: `Product ${item.name} not found.` });
+        }
+        if (product.countInStock < item.quantity) {
+          return res.status(400).json({ message: `Insufficient stock for ${product.name}. Only ${product.countInStock} left.` });
+        }
+      }
+
+      // 2. Deduct Stock
+      for (const item of items) {
+        const product = await Product.findById(item.id);
+        product.countInStock -= item.quantity;
+        await product.save();
+      }
+
       const newOrder = await Order.create({
         userEmail,
         userName,
@@ -457,7 +475,6 @@ app.post('/api/payments/payhere-notify', async (req, res) => {
     return res.status(400).send('Invalid merchant ID');
   }
 
-  // Verify PayHere MD5 Signature if Merchant Secret is configured
   const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET || '';
   if (merchantSecret) {
     const hashedSecret = crypto.createHash('md5').update(merchantSecret).digest('hex').toUpperCase();
@@ -470,27 +487,35 @@ app.post('/api/payments/payhere-notify', async (req, res) => {
   }
 
   try {
-    const isSuccess = status_code === '2' || status_code === 2;
+    const statusCode = Number(status_code);
+    const isSuccess = statusCode === 2;
+    const receivedAmount = Number(payhere_amount);
 
     if (isDBConnected()) {
       const order = await Order.findById(order_id);
-      if (order) {
-        if (isSuccess) {
-          order.isPaid = true;
-          order.paidAt = Date.now();
-          order.status = 'paid';
-          order.paymentResult = {
-            id: payment_id,
-            status: 'completed',
-            update_time: new Date().toISOString(),
-          };
-          await order.save();
-          // Trigger Confirmation Notification
-          notifyOrderConfirmed(order).catch(err => console.error('Notification Error:', err));
-        } else {
-          order.status = 'failed';
-          await order.save();
-        }
+      if (!order) {
+        return res.status(404).send('Order not found');
+      }
+
+      if (Number.isFinite(receivedAmount) && Math.abs(order.total - receivedAmount) > 0.01) {
+        return res.status(400).send('Amount mismatch');
+      }
+
+      if (isSuccess) {
+        order.isPaid = true;
+        order.paidAt = Date.now();
+        order.status = 'paid';
+        order.paymentResult = {
+          id: payment_id,
+          status: 'completed',
+          update_time: new Date().toISOString(),
+        };
+        await order.save();
+        // Trigger Confirmation Notification
+        notifyOrderConfirmed(order).catch(err => console.error('Notification Error:', err));
+      } else {
+        order.status = 'failed';
+        await order.save();
       }
     } else {
       const order = inMemoryOrders.find(o => o.id === order_id);

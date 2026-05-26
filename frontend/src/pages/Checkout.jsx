@@ -53,6 +53,12 @@ const Checkout = () => {
   };
 
   const handlePayHerePayment = async (order, merchantId) => {
+    const payhere = window?.payhere;
+    if (!payhere) {
+      throw new Error('PayHere SDK is not loaded. Refresh the page and try again.');
+    }
+
+    const payhereOrderId = order.id || order._id;
     const nameParts = form.fullName.trim().split(' ');
     const firstName = nameParts[0] || 'Customer';
     const lastName = nameParts.slice(1).join(' ') || 'Name';
@@ -63,8 +69,8 @@ const Checkout = () => {
       return_url: `${window.location.origin}/success`,
       cancel_url: `${window.location.origin}/checkout`,
       notify_url: `${API_BASE}/api/payments/payhere-notify`,
-      order_id: order.id || order._id,
-      items: `Order #${(order.id || order._id).slice(-8).toUpperCase()}`,
+      order_id: payhereOrderId,
+      items: `Order #${String(payhereOrderId).slice(-8).toUpperCase()}`,
       amount: grandTotal.toFixed(2),
       currency: 'LKR',
       first_name: firstName,
@@ -76,7 +82,7 @@ const Checkout = () => {
       country: 'Sri Lanka'
     };
 
-    window.payhere.onCompleted = async function onCompleted(orderId) {
+    payhere.onCompleted = async function onCompleted(orderId) {
       try {
         const res = await fetch(`${API_BASE}/api/orders/${orderId}/pay`, {
           method: 'PUT',
@@ -108,17 +114,17 @@ const Checkout = () => {
       }
     };
 
-    window.payhere.onDismissed = function onDismissed() {
+    payhere.onDismissed = function onDismissed() {
       setErrors({ submit: 'Payment was cancelled or dismissed.' });
       setSubmitting(false);
     };
 
-    window.payhere.onError = function onError(error) {
+    payhere.onError = function onError(error) {
       setErrors({ submit: `Payment gateway error: ${error}` });
       setSubmitting(false);
     };
 
-    window.payhere.startPayment(paymentDetails);
+    payhere.startPayment(paymentDetails);
   };
 
   const handleSubmit = async (event) => {
@@ -139,7 +145,7 @@ const Checkout = () => {
           ? `Store Pickup at ${form.branch} Branch`
           : `${form.address1}${form.address2 ? ', ' + form.address2 : ''}, ${form.city}, ${form.state} ${form.postalCode}, ${form.country}`,
         phone: form.phone,
-        paymentMethod: form.paymentMethod,
+        paymentMethod: form.paymentMethod === 'Online Payment' ? 'PayHere Online' : form.paymentMethod,
         orderType: form.orderType,
       };
 
