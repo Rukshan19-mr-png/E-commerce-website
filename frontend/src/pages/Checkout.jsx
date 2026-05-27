@@ -65,13 +65,13 @@ const Checkout = () => {
 
     const paymentDetails = {
       sandbox: true,
-      merchant_id: merchantId || '1211149',
+      merchant_id: String(merchantId || '1211149'),
       return_url: `${window.location.origin}/success`,
       cancel_url: `${window.location.origin}/checkout`,
       notify_url: `${API_BASE}/api/payments/payhere-notify`,
-      order_id: payhereOrderId,
+      order_id: String(payhereOrderId),
       items: `Order #${String(payhereOrderId).slice(-8).toUpperCase()}`,
-      amount: grandTotal.toFixed(2),
+      amount: String(grandTotal.toFixed(2)),
       currency: 'LKR',
       first_name: firstName,
       last_name: lastName,
@@ -120,11 +120,41 @@ const Checkout = () => {
     };
 
     payhere.onError = function onError(error) {
-      setErrors({ submit: `Payment gateway error: ${error}` });
+      console.error('PayHere Error:', error);
+      console.error('PayHere Error Details:', {
+        merchant_id: paymentDetails.merchant_id,
+        order_id: paymentDetails.order_id,
+        amount: paymentDetails.amount,
+        sandbox: paymentDetails.sandbox
+      });
+
+      const msg = typeof error === 'string' ? error : (error && error.message) ? error.message : String(error);
+
+      // Provide actionable guidance for common PayHere failures
+      if (/unauthori|unauth/i.test(msg) || /blocked by ORB|orb/i.test(msg)) {
+        setErrors({ submit: `Payment gateway blocked: ${msg}. Try these steps: 1) Authorize your merchant (1211149) or your merchant ID in PayHere dashboard and add http://localhost:5173 as an allowed origin; 2) If testing locally, ensure sandbox is enabled in your PayHere account; 3) Allow third-party cookies or test in a new browser profile; 4) Add PAYHERE_MERCHANT_SECRET in backend .env for signature verification.` });
+      } else {
+        setErrors({ 
+          submit: `Payment gateway error: ${msg}. If using sandbox/demo merchant (1211149), this may be expected. For production, configure real PayHere merchant credentials.` 
+        });
+      }
+
       setSubmitting(false);
     };
 
-    payhere.startPayment(paymentDetails);
+    try {
+      console.log('Initiating PayHere payment with:', {
+        merchant_id: paymentDetails.merchant_id,
+        order_id: paymentDetails.order_id,
+        amount: paymentDetails.amount,
+        sandbox: paymentDetails.sandbox
+      });
+      payhere.startPayment(paymentDetails);
+    } catch (error) {
+      console.error('PayHere startPayment error:', error);
+      setErrors({ submit: `Failed to start PayHere payment: ${error.message}` });
+      setSubmitting(false);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -149,9 +179,27 @@ const Checkout = () => {
         orderType: form.orderType,
       };
 
+      // Check latest stock for each cart item to avoid placing orders for out-of-stock items
+      for (const item of cart) {
+        try {
+          const prodRes = await fetch(`${API_BASE}/api/products/${item.id}`);
+          if (prodRes.ok) {
+            const prod = await prodRes.json();
+            const available = prod.countInStock !== undefined ? prod.countInStock : prod.count || 0;
+            if (available < item.quantity) {
+              setErrors({ submit: `Insufficient stock for ${item.name}. Only ${available} left.` });
+              setSubmitting(false);
+              return;
+            }
+          }
+        } catch (err) {
+          // ignore individual product check errors and continue; backend will still validate
+        }
+      }
+
       const response = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${auth?.token}`
         },
@@ -159,7 +207,18 @@ const Checkout = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to place order');
+        // Try to extract server error message for a clearer UI message
+        let errMsg = 'Failed to place order. Please try again.';
+        try {
+          const errBody = await response.json();
+          if (errBody && errBody.message) errMsg = errBody.message;
+          else if (typeof errBody === 'string') errMsg = errBody;
+        } catch (e) {
+          // ignore parse errors and use fallback message
+        }
+        setErrors({ submit: errMsg });
+        setSubmitting(false);
+        return;
       }
 
       const data = await response.json();
