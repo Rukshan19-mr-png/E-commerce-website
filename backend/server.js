@@ -360,7 +360,13 @@ app.post('/api/orders', async (req, res) => {
     if (isDBConnected()) {
       // 1. Verify Stock
       for (const item of items) {
-        const product = await Product.findById(item.id);
+        // Support legacy numeric/string `id` values from static seed data by
+        // attempting to match either `_id` (ObjectId) or the `id` field on the document.
+        // Build a safe query: only query by _id if the value is a valid ObjectId
+        const orQuery = [];
+        if (mongoose.Types.ObjectId.isValid(item.id)) orQuery.push({ _id: item.id });
+        orQuery.push({ id: item.id });
+        const product = await Product.findOne(orQuery.length > 1 ? { $or: orQuery } : orQuery[0]);
         if (!product) {
           return res.status(404).json({ message: `Product ${item.name} not found.` });
         }
@@ -371,9 +377,17 @@ app.post('/api/orders', async (req, res) => {
 
       // 2. Deduct Stock
       for (const item of items) {
-        const product = await Product.findById(item.id);
+        // Resolve product by _id or legacy `id` field and update stock.
+        const orQuery = [];
+        if (mongoose.Types.ObjectId.isValid(item.id)) orQuery.push({ _id: item.id });
+        orQuery.push({ id: item.id });
+        const product = await Product.findOne(orQuery.length > 1 ? { $or: orQuery } : orQuery[0]);
+        // If somehow product is missing here, skip (it was validated above)
+        if (!product) continue;
         product.countInStock -= item.quantity;
         await product.save();
+        // Normalize item id to the real ObjectId for the stored order
+        item.id = product._id.toString();
       }
 
       const newOrder = await Order.create({
@@ -470,8 +484,19 @@ app.post('/api/payments/payhere-notify', async (req, res) => {
     md5sig
   } = req.body;
 
+  console.log('[PayHere IPN] Received payment notification:', {
+    merchant_id,
+    order_id,
+    payment_id,
+    payhere_amount,
+    payhere_currency,
+    status_code,
+    has_signature: !!md5sig
+  });
+
   const localMerchantId = process.env.PAYHERE_MERCHANT_ID || '1211149';
   if (merchant_id !== localMerchantId) {
+    console.error('[PayHere IPN] Merchant ID mismatch:', { received: merchant_id, expected: localMerchantId });
     return res.status(400).send('Invalid merchant ID');
   }
 
@@ -482,8 +507,11 @@ app.post('/api/payments/payhere-notify', async (req, res) => {
     const localMd5 = crypto.createHash('md5').update(hashString).digest('hex').toUpperCase();
 
     if (localMd5 !== md5sig) {
+      console.error('[PayHere IPN] Signature mismatch:', { expected: localMd5, received: md5sig });
       return res.status(400).send('Invalid signature');
     }
+  } else {
+    console.warn('[PayHere IPN] No merchant secret configured - skipping signature validation');
   }
 
   try {
