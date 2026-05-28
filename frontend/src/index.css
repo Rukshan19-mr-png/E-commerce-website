@@ -206,17 +206,19 @@ header {
   justify-content: center;
   text-align: center;
   padding: 4rem 2rem;
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-              url('/images/hero-bg.png');
+  background: linear-gradient(180deg, rgba(0,0,0,0.26), rgba(0,0,0,0.12)), url('/images/plants/bougainvillea-mixed--flower.jpg');
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
+  background-attachment: scroll;
   margin: 1.5rem;
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
 }
+
+/* Decorative hero plant image */
+/* hero plant removed */
 
 .hero::after {
   content: '';
