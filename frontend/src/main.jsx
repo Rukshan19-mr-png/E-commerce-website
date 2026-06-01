@@ -4,6 +4,7 @@ import App from './App.jsx';
 import './index.css';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 const payhereScriptUrl = import.meta.env.VITE_PAYHERE_SCRIPT_URL || 'https://www.payhere.lk/lib/payhere.js';
 
@@ -53,10 +54,12 @@ loadPayHereScript().catch((error) => {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </React.StrictMode>
 );

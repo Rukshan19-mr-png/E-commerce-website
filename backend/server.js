@@ -25,6 +25,11 @@ connectDB();
 
 const app = express();
 
+// PayHere config visibility (do not print secrets)
+const PAYHERE_MERCHANT_ID = process.env.PAYHERE_MERCHANT_ID || '1211149';
+const PAYHERE_MERCHANT_SECRET = process.env.PAYHERE_MERCHANT_SECRET || '';
+console.log(`[PayHere] merchantId=${PAYHERE_MERCHANT_ID} secretConfigured=${!!PAYHERE_MERCHANT_SECRET}`);
+
 // Build allowed origins from env var (comma-separated) + always include localhost for dev
 const productionOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
@@ -32,6 +37,8 @@ const productionOrigins = process.env.ALLOWED_ORIGINS
 const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174',
   ...productionOrigins,
 ];
 
@@ -506,7 +513,7 @@ app.post('/api/payments/payhere-notify', async (req, res) => {
     const hashString = merchant_id + order_id + payhere_amount + payhere_currency + status_code + hashedSecret;
     const localMd5 = crypto.createHash('md5').update(hashString).digest('hex').toUpperCase();
 
-    if (localMd5 !== md5sig) {
+    if (localMd5 !== (md5sig || '').toUpperCase()) {
       console.error('[PayHere IPN] Signature mismatch:', { expected: localMd5, received: md5sig });
       return res.status(400).send('Invalid signature');
     }
@@ -620,6 +627,41 @@ app.get('/api/config/payhere', (req, res) => {
     sandbox: process.env.NODE_ENV !== 'production'
   });
 });
+
+// Generate PayHere payment hash server-side (merchant secret never sent to browser)
+app.post('/api/payments/payhere-hash', (req, res) => {
+  const { merchant_id, order_id, amount, currency } = req.body;
+
+  if (!merchant_id || !order_id || !amount || !currency) {
+    return res.status(400).json({ message: 'merchant_id, order_id, amount, and currency are required.' });
+  }
+
+  const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET || '';
+  if (!merchantSecret) {
+    return res.status(500).json({ message: 'PayHere merchant secret is not configured on the server.' });
+  }
+
+  // Log input for debugging (non-secret data only)
+  try {
+    const formattedAmount = parseFloat(amount).toFixed(2);
+    console.log('[PayHere Hash] request:', { merchant_id, order_id, amount, formattedAmount, currency });
+  } catch (e) {
+    console.warn('[PayHere Hash] Unable to parse amount for logging:', amount);
+  }
+
+  // PayHere hash formula: MD5( merchant_id + order_id + amount + currency + MD5(secret).toUpperCase() ).toUpperCase()
+  const hashedSecret = crypto.createHash('md5').update(merchantSecret).digest('hex').toUpperCase();
+  const formattedAmount = parseFloat(amount).toFixed(2);
+  const hashInput = merchant_id + order_id + formattedAmount + currency + hashedSecret;
+  const hash = crypto.createHash('md5').update(hashInput).digest('hex').toUpperCase();
+
+  console.log('[PayHere Hash] Generated hash for order:', order_id, '| amount:', formattedAmount);
+  res.json({ hash });
+});
+
+// Debug endpoint: compute PayHere MD5 using server-side merchant secret
+// (temporary - safe to remove after debugging)
+// debug endpoint removed
 
 
 app.get('/api/orders', async (req, res) => {

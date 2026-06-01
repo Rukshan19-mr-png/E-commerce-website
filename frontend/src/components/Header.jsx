@@ -1,10 +1,13 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
+import { Sun, Moon } from 'lucide-react';
 
 const Header = () => {
   const { auth, logout, isStaff } = useAuth();
   const { cartCount } = useCart();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -44,6 +47,20 @@ const Header = () => {
                 <li><Link to="/signup" className="btn-primary" style={{ padding: '8px 20px', color: '#fff' }}>Join Us</Link></li>
               </>
             )}
+            <li>
+              <button
+                className="theme-toggle-btn"
+                onClick={toggleTheme}
+                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {theme === 'dark' ? (
+                  <Sun size={18} strokeWidth={2.2} />
+                ) : (
+                  <Moon size={18} strokeWidth={2.2} />
+                )}
+              </button>
+            </li>
           </ul>
         </nav>
       </div>

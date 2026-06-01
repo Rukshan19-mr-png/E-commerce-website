@@ -52,7 +52,7 @@ const Checkout = () => {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handlePayHerePayment = async (order, merchantId) => {
+  const handlePayHerePayment = async (order, merchantId, sandboxMode) => {
     const payhere = window?.payhere;
     if (!payhere) {
       throw new Error('PayHere SDK is not loaded. Refresh the page and try again.');
@@ -62,24 +62,52 @@ const Checkout = () => {
     const nameParts = form.fullName.trim().split(' ');
     const firstName = nameParts[0] || 'Customer';
     const lastName = nameParts.slice(1).join(' ') || 'Name';
+    const formattedAmount = grandTotal.toFixed(2);
+    const currency = 'LKR';
+
+    // Fetch hash from backend (merchant secret stays server-side)
+    let hash = '';
+    try {
+      const hashRes = await fetch(`${API_BASE}/api/payments/payhere-hash`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          merchant_id: String(merchantId),
+          order_id: String(payhereOrderId),
+          amount: formattedAmount,
+          currency,
+        }),
+      });
+      if (!hashRes.ok) {
+        const errData = await hashRes.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to generate payment hash');
+      }
+      const hashData = await hashRes.json();
+      hash = hashData.hash;
+    } catch (err) {
+      setErrors({ submit: `Payment setup failed: ${err.message}` });
+      setSubmitting(false);
+      return;
+    }
 
     const paymentDetails = {
-      sandbox: true,
-      merchant_id: String(merchantId || '1211149'),
+      sandbox: sandboxMode,
+      merchant_id: String(merchantId),
       return_url: `${window.location.origin}/success`,
       cancel_url: `${window.location.origin}/checkout`,
       notify_url: `${API_BASE}/api/payments/payhere-notify`,
       order_id: String(payhereOrderId),
       items: `Order #${String(payhereOrderId).slice(-8).toUpperCase()}`,
-      amount: String(grandTotal.toFixed(2)),
-      currency: 'LKR',
+      amount: formattedAmount,
+      currency,
+      hash,
       first_name: firstName,
       last_name: lastName,
       email: form.email,
       phone: form.phone,
       address: form.orderType === 'Store Pickup' ? 'Store Pickup' : form.address1,
       city: form.orderType === 'Store Pickup' ? 'Kadawatha' : form.city,
-      country: 'Sri Lanka'
+      country: 'Sri Lanka',
     };
 
     payhere.onCompleted = async function onCompleted(orderId) {
@@ -115,40 +143,23 @@ const Checkout = () => {
     };
 
     payhere.onDismissed = function onDismissed() {
-      setErrors({ submit: 'Payment was cancelled or dismissed.' });
+      setErrors({ submit: 'Payment was cancelled. You can try again.' });
       setSubmitting(false);
     };
 
     payhere.onError = function onError(error) {
       console.error('PayHere Error:', error);
-      console.error('PayHere Error Details:', {
-        merchant_id: paymentDetails.merchant_id,
-        order_id: paymentDetails.order_id,
-        amount: paymentDetails.amount,
-        sandbox: paymentDetails.sandbox
+      const msg = typeof error === 'string' ? error : (error?.message ?? String(error));
+      setErrors({
+        submit: `Payment gateway error: ${msg}. Make sure your PayHere sandbox account has http://localhost:5173 whitelisted as an allowed domain.`
       });
-
-      const msg = typeof error === 'string' ? error : (error && error.message) ? error.message : String(error);
-
-      // Provide actionable guidance for common PayHere failures
-      if (/unauthori|unauth/i.test(msg) || /blocked by ORB|orb/i.test(msg)) {
-        setErrors({ submit: `Payment gateway blocked: ${msg}. Try these steps: 1) Authorize your merchant (1211149) or your merchant ID in PayHere dashboard and add http://localhost:5173 as an allowed origin; 2) If testing locally, ensure sandbox is enabled in your PayHere account; 3) Allow third-party cookies or test in a new browser profile; 4) Add PAYHERE_MERCHANT_SECRET in backend .env for signature verification.` });
-      } else {
-        setErrors({ 
-          submit: `Payment gateway error: ${msg}. If using sandbox/demo merchant (1211149), this may be expected. For production, configure real PayHere merchant credentials.` 
-        });
-      }
-
       setSubmitting(false);
     };
 
     try {
-      console.log('Initiating PayHere payment with:', {
-        merchant_id: paymentDetails.merchant_id,
-        order_id: paymentDetails.order_id,
-        amount: paymentDetails.amount,
-        sandbox: paymentDetails.sandbox
-      });
+      console.log('[PayHere] Starting payment | order:', payhereOrderId, '| amount:', formattedAmount, '| sandbox:', sandboxMode);
+      // Log payment details for debugging (does not include merchant secret)
+      console.log('[PayHere] paymentDetails:', paymentDetails);
       payhere.startPayment(paymentDetails);
     } catch (error) {
       console.error('PayHere startPayment error:', error);
@@ -237,16 +248,18 @@ const Checkout = () => {
       } else {
         // Online Payment with PayHere
         let merchantId = '1211149';
+        let sandboxMode = true;
         try {
           const configRes = await fetch(`${API_BASE}/api/config/payhere`);
           if (configRes.ok) {
             const configData = await configRes.json();
             merchantId = configData.merchantId;
+            sandboxMode = configData.sandbox;
           }
         } catch {
           // ignore config error, use sandbox fallback
         }
-        await handlePayHerePayment(order, merchantId);
+        await handlePayHerePayment(order, merchantId, sandboxMode);
       }
     } catch {
       setErrors({ submit: 'Failed to place order. Please try again.' });

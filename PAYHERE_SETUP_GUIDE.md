@@ -34,6 +34,16 @@ PAYHERE_MERCHANT_ID=your_actual_merchant_id_here
 PAYHERE_MERCHANT_SECRET=your_actual_merchant_secret_here
 ```
 
+### Whitelist Domains (Important)
+PayHere will reject requests that come from domains not registered in your merchant dashboard. To avoid "Unauthorized payment request":
+
+1. Login to your PayHere Merchant Dashboard: https://merchant.payhere.lk
+2. Go to Settings → API Configuration → Allowed Domains (or similar)
+3. Add `http://localhost:5173` (for local frontend dev) and your production frontend domain.
+4. Add your backend `notify_url` domain if it's different (e.g., `http://localhost:5000`).
+
+If you do not whitelist the origin/notify URLs correctly, PayHere will respond with "Unauthorized payment request".
+
 ### Step 3: Enable Sandbox (For Testing)
 1. Log in to PayHere Merchant Dashboard: https://merchant.payhere.lk
 2. Go to Settings → API Configuration  
