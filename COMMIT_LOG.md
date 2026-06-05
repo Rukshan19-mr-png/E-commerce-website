@@ -5,3 +5,4 @@ Commit log for 2026-06-05
 3. style: update index.css adjustments
 4. checkout: fix PayHere hash call and flow
 5. chore: add root package.json for workspace scripts
+6. chore: add hero image asset
