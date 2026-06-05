@@ -12,3 +12,4 @@ Commit log for 2026-06-05
 10. chore: reorganize server start logic for clarity
 11. fix: avoid starting server twice on connect
 12. perf: small improvements to connection handling
+13. docs: add instructions for Atlas IP whitelist
