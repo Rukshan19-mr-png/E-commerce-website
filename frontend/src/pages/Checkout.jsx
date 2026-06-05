@@ -247,7 +247,7 @@ const Checkout = () => {
         });
       } else {
         // Online Payment with PayHere
-        let merchantId = '1211149';
+        let merchantId = '1236112'; // Must match PAYHERE_MERCHANT_ID in backend .env
         let sandboxMode = true;
         try {
           const configRes = await fetch(`${API_BASE}/api/config/payhere`);
