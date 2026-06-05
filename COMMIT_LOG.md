@@ -14,3 +14,4 @@ Commit log for 2026-06-05
 12. perf: small improvements to connection handling
 13. docs: add instructions for Atlas IP whitelist
 14. test: validate endpoints after DB connection
+15. chore: update .env example and notes
