@@ -16,3 +16,4 @@ Commit log for 2026-06-05
 14. test: validate endpoints after DB connection
 15. chore: update .env example and notes
 16. ci: prepare push with multiple commits per request
+17. docs: note about reverting dev CORS relaxation
