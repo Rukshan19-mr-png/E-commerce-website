@@ -4,3 +4,4 @@ Commit log for 2026-06-05
 2. server: start after DB connection and add debug endpoint
 3. style: update index.css adjustments
 4. checkout: fix PayHere hash call and flow
+5. chore: add root package.json for workspace scripts
