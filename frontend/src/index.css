@@ -271,7 +271,7 @@ header {
   justify-content: center;
   text-align: center;
   padding: 4rem 2rem;
-  background: var(--hero-overlay), url('/images/plants/bougainvillea-mixed--flower.jpg');
+  background: var(--hero-overlay), url('/images/plants/3d_plants_hero.png');
   background-size: cover;
   background-position: center;
   background-attachment: scroll;
