@@ -9,3 +9,4 @@ Commit log for 2026-06-05
 7. docs: add COMMIT_LOG and entries (tracking)
 8. test: quick debug endpoint added for DB status
 9. refactor: small improvements to DB connector
+10. chore: reorganize server start logic for clarity
