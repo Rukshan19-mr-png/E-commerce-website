@@ -21,14 +21,26 @@ const inMemoryOrders = [];
 const inMemoryResetCodes = {}; // { email: { code, expire } }
 
 const connectDB = require('./config/db').default;
-connectDB();
+
+// Attempt DB connection before starting server so logs reflect real state
+let dbConnected = false;
+connectDB()
+  .then(() => { dbConnected = true; })
+  .catch(() => { dbConnected = false; })
+  .finally(() => {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`MongoDB connected: ${dbConnected}`);
+    });
+  });
 
 const app = express();
 
 // PayHere config visibility (do not print secrets)
-const PAYHERE_MERCHANT_ID = process.env.PAYHERE_MERCHANT_ID || '1211149';
+const PAYHERE_MERCHANT_ID = process.env.PAYHERE_MERCHANT_ID || '1236112';
 const PAYHERE_MERCHANT_SECRET = process.env.PAYHERE_MERCHANT_SECRET || '';
-console.log(`[PayHere] merchantId=${PAYHERE_MERCHANT_ID} secretConfigured=${!!PAYHERE_MERCHANT_SECRET}`);
+console.log(`[PayHere] merchantId="${PAYHERE_MERCHANT_ID}" secretLength=${PAYHERE_MERCHANT_SECRET.length} secretConfigured=${!!PAYHERE_MERCHANT_SECRET}`);
 
 // Build allowed origins from env var (comma-separated) + always include localhost for dev
 const productionOrigins = process.env.ALLOWED_ORIGINS
@@ -92,6 +104,25 @@ const isDBConnected = () => mongoose.connection.readyState === 1;
 
 app.get('/api', (req, res) => {
   res.json({ message: 'Welcome to Plantopia API! 🌿' });
+});
+
+// Debug endpoint (development only) - reports DB connection and sample counts
+app.get('/api/debug/db', async (req, res) => {
+  try {
+    const connected = isDBConnected();
+    const info = { connected };
+    if (connected) {
+      try {
+        const count = await Product.countDocuments();
+        info.products = count;
+      } catch (e) {
+        info.products = 'error';
+      }
+    }
+    res.json(info);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.get('/api/products', async (req, res) => {
@@ -501,7 +532,7 @@ app.post('/api/payments/payhere-notify', async (req, res) => {
     has_signature: !!md5sig
   });
 
-  const localMerchantId = process.env.PAYHERE_MERCHANT_ID || '1211149';
+  const localMerchantId = process.env.PAYHERE_MERCHANT_ID || '1236112';
   if (merchant_id !== localMerchantId) {
     console.error('[PayHere IPN] Merchant ID mismatch:', { received: merchant_id, expected: localMerchantId });
     return res.status(400).send('Invalid merchant ID');
@@ -623,7 +654,7 @@ app.put('/api/orders/:id/status', async (req, res) => {
 
 app.get('/api/config/payhere', (req, res) => {
   res.json({
-    merchantId: process.env.PAYHERE_MERCHANT_ID || '1211149',
+    merchantId: process.env.PAYHERE_MERCHANT_ID || '1236112',
     sandbox: process.env.NODE_ENV !== 'production'
   });
 });
@@ -736,9 +767,6 @@ app.put('/api/products/:id/stock', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// NOTE: server is started in connectDB() finally handler above.
 
 
