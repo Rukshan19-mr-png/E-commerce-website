@@ -15,3 +15,4 @@ Commit log for 2026-06-05
 13. docs: add instructions for Atlas IP whitelist
 14. test: validate endpoints after DB connection
 15. chore: update .env example and notes
+16. ci: prepare push with multiple commits per request
