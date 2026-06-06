@@ -1,0 +1,1 @@
+Commit 5/11: Improve error messages in checkout page for PayHere SDK failures.
