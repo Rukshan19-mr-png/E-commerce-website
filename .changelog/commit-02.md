@@ -1,0 +1,1 @@
+Commit 2/11: Use decoded PayHere secret variable across server for hash generation.
