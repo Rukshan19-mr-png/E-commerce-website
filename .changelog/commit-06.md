@@ -1,0 +1,1 @@
+Commit 6/11: Add notes about whitelisting origins and notify_url in PAYHERE_SETUP_GUIDE.
