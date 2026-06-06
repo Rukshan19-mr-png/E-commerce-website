@@ -1,0 +1,1 @@
+Commit 10/11: Add .changelog directory to track small commit markers for GitHub push.
