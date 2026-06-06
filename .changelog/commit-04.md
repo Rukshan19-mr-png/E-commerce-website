@@ -1,0 +1,1 @@
+Commit 4/11: Log PayHere hash generation and input for debugging (non-secret data only).
