@@ -28,7 +28,7 @@ const connectDB = async () => {
   console.log(`Attempting MongoDB connection to: ${hostInfo} (credentials masked: ${masked})`);
 
   try {
-    const conn = await connect(uri, { keepAlive: true });
+    const conn = await connect(uri);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {
