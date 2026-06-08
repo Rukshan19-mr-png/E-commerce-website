@@ -39,7 +39,22 @@ const app = express();
 
 // PayHere config visibility (do not print secrets)
 const PAYHERE_MERCHANT_ID = process.env.PAYHERE_MERCHANT_ID || '1236112';
-const PAYHERE_MERCHANT_SECRET = process.env.PAYHERE_MERCHANT_SECRET || '';
+// Support secrets provided either as plain text or base64-encoded in .env
+const PAYHERE_MERCHANT_SECRET_RAW = process.env.PAYHERE_MERCHANT_SECRET || '';
+let PAYHERE_MERCHANT_SECRET = PAYHERE_MERCHANT_SECRET_RAW;
+try {
+  // Detect base64 encoding: re-encode round-trip should equal original when valid base64
+  if (PAYHERE_MERCHANT_SECRET_RAW) {
+    const decoded = Buffer.from(PAYHERE_MERCHANT_SECRET_RAW, 'base64').toString('utf8');
+    const reencoded = Buffer.from(decoded, 'utf8').toString('base64');
+    if (reencoded === PAYHERE_MERCHANT_SECRET_RAW) {
+      PAYHERE_MERCHANT_SECRET = decoded;
+      console.log('[PayHere] Merchant secret detected as base64 in .env — decoded for use.');
+    }
+  }
+} catch (e) {
+  // If decoding fails, keep the raw value — we'll log presence only
+}
 console.log(`[PayHere] merchantId="${PAYHERE_MERCHANT_ID}" secretLength=${PAYHERE_MERCHANT_SECRET.length} secretConfigured=${!!PAYHERE_MERCHANT_SECRET}`);
 
 // Build allowed origins from env var (comma-separated) + always include localhost for dev
@@ -538,7 +553,7 @@ app.post('/api/payments/payhere-notify', async (req, res) => {
     return res.status(400).send('Invalid merchant ID');
   }
 
-  const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET || '';
+  const merchantSecret = PAYHERE_MERCHANT_SECRET || '';
   if (merchantSecret) {
     const hashedSecret = crypto.createHash('md5').update(merchantSecret).digest('hex').toUpperCase();
     const hashString = merchant_id + order_id + payhere_amount + payhere_currency + status_code + hashedSecret;
@@ -667,7 +682,7 @@ app.post('/api/payments/payhere-hash', (req, res) => {
     return res.status(400).json({ message: 'merchant_id, order_id, amount, and currency are required.' });
   }
 
-  const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET || '';
+  const merchantSecret = PAYHERE_MERCHANT_SECRET || '';
   if (!merchantSecret) {
     return res.status(500).json({ message: 'PayHere merchant secret is not configured on the server.' });
   }
