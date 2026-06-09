@@ -52,118 +52,121 @@ const Checkout = () => {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handlePayHerePayment = async (order, merchantId, sandboxMode) => {
-    const payhere = window?.payhere;
-    if (!payhere) {
-      throw new Error('PayHere SDK is not loaded. Refresh the page and try again.');
+  const loadScript = (src) => new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) return resolve();
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('Failed to load script: ' + src));
+    document.head.appendChild(s);
+  });
+
+  const handlePayPalPayment = async (order) => {
+    const orderId = order.id || order._id;
+    const amount = grandTotal.toFixed(2);
+
+    // Get PayPal client id from backend
+    let clientId = 'sb';
+    try {
+      const cfg = await fetch(`${API_BASE}/api/config/paypal`);
+      if (cfg.ok) {
+        const cfgData = await cfg.json();
+        clientId = cfgData.clientId || clientId;
+      }
+    } catch (e) {
+      console.warn('Failed to fetch PayPal config, falling back to sandbox client id');
     }
 
-    const payhereOrderId = order.id || order._id;
-    const nameParts = form.fullName.trim().split(' ');
-    const firstName = nameParts[0] || 'Customer';
-    const lastName = nameParts.slice(1).join(' ') || 'Name';
-    const formattedAmount = grandTotal.toFixed(2);
-    const currency = 'LKR';
-
-    // Fetch hash from backend (merchant secret stays server-side)
-    let hash = '';
+    const sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
     try {
-      const hashRes = await fetch(`${API_BASE}/api/payments/payhere-hash`, {
+      await loadScript(sdkUrl);
+    } catch (err) {
+      setErrors({ submit: 'Failed to load PayPal SDK. Please try again later.' });
+      setSubmitting(false);
+      return;
+    }
+
+    // Create PayPal order on server
+    let paypalOrderId = null;
+    try {
+      const createRes = await fetch(`${API_BASE}/api/payments/paypal/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          merchant_id: String(merchantId),
-          order_id: String(payhereOrderId),
-          amount: formattedAmount,
-          currency,
-        }),
+        body: JSON.stringify({ orderId, amount }),
       });
-      if (!hashRes.ok) {
-        const errData = await hashRes.json().catch(() => ({}));
-        throw new Error(errData.message || 'Failed to generate payment hash');
-      }
-      const hashData = await hashRes.json();
-      hash = hashData.hash;
+      const createData = await createRes.json();
+      if (!createRes.ok) throw new Error(createData.message || 'Failed to create PayPal order');
+      paypalOrderId = createData.id;
     } catch (err) {
       setErrors({ submit: `Payment setup failed: ${err.message}` });
       setSubmitting(false);
       return;
     }
 
-    const paymentDetails = {
-      sandbox: sandboxMode,
-      merchant_id: String(merchantId),
-      return_url: `${window.location.origin}/success`,
-      cancel_url: `${window.location.origin}/checkout`,
-      notify_url: `${API_BASE}/api/payments/payhere-notify`,
-      order_id: String(payhereOrderId),
-      items: `Order #${String(payhereOrderId).slice(-8).toUpperCase()}`,
-      amount: formattedAmount,
-      currency,
-      hash,
-      first_name: firstName,
-      last_name: lastName,
-      email: form.email,
-      phone: form.phone,
-      address: form.orderType === 'Store Pickup' ? 'Store Pickup' : form.address1,
-      city: form.orderType === 'Store Pickup' ? 'Kadawatha' : form.city,
-      country: 'Sri Lanka',
-    };
-
-    payhere.onCompleted = async function onCompleted(orderId) {
-      try {
-        const res = await fetch(`${API_BASE}/api/orders/${orderId}/pay`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${auth?.token}`
-          },
-          body: JSON.stringify({
-            id: 'payhere-tr-' + Date.now(),
-            status: 'completed',
-          })
-        });
-
-        if (!res.ok) throw new Error('Failed to update order payment');
-
-        clearCart();
-        navigate('/success', {
-          state: {
-            fullName: form.fullName,
-            email: form.email,
-            total: grandTotal,
-            paymentMethod: 'PayHere Online',
-            isPaid: true
-          },
-        });
-      } catch {
-        setErrors({ submit: 'Payment successful but status sync failed. Please contact support.' });
-        setSubmitting(false);
-      }
-    };
-
-    payhere.onDismissed = function onDismissed() {
-      setErrors({ submit: 'Payment was cancelled. You can try again.' });
-      setSubmitting(false);
-    };
-
-    payhere.onError = function onError(error) {
-      console.error('PayHere Error:', error);
-      const msg = typeof error === 'string' ? error : (error?.message ?? String(error));
-      setErrors({
-        submit: `Payment gateway error: ${msg}. Make sure your PayHere sandbox account has http://localhost:5173 whitelisted as an allowed domain.`
-      });
-      setSubmitting(false);
-    };
-
+    // Render PayPal Buttons
     try {
-      console.log('[PayHere] Starting payment | order:', payhereOrderId, '| amount:', formattedAmount, '| sandbox:', sandboxMode);
-      // Log payment details for debugging (does not include merchant secret)
-      console.log('[PayHere] paymentDetails:', paymentDetails);
-      payhere.startPayment(paymentDetails);
-    } catch (error) {
-      console.error('PayHere startPayment error:', error);
-      setErrors({ submit: `Failed to start PayHere payment: ${error.message}` });
+      // Ensure container exists and is empty
+      const container = document.getElementById('paypal-button-container');
+      if (container) container.innerHTML = '';
+
+      // eslint-disable-next-line no-undef
+      window.paypal.Buttons({
+        createOrder: () => paypalOrderId,
+        onApprove: async (_data, actions) => {
+          try {
+            const capRes = await fetch(`${API_BASE}/api/payments/paypal/capture-order`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paypalOrderId, orderId }),
+            });
+            const capData = await capRes.json();
+            if (!capRes.ok) throw new Error(capData.message || 'Failed to capture PayPal order');
+
+            // Mark order paid in backend
+            const res = await fetch(`${API_BASE}/api/orders/${orderId}/pay`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${auth?.token}`
+              },
+              body: JSON.stringify({
+                id: capData.id || ('paypal-' + Date.now()),
+                status: 'completed'
+              })
+            });
+
+            if (!res.ok) throw new Error('Failed to update order payment');
+
+            clearCart();
+            navigate('/success', {
+              state: {
+                fullName: form.fullName,
+                email: form.email,
+                total: grandTotal,
+                paymentMethod: 'PayPal',
+                isPaid: true
+              },
+            });
+          } catch (err) {
+            console.error('PayPal capture error:', err);
+            setErrors({ submit: 'Payment successful but status sync failed. Please contact support.' });
+            setSubmitting(false);
+          }
+        },
+        onCancel: () => {
+          setErrors({ submit: 'Payment was cancelled. You can try again.' });
+          setSubmitting(false);
+        },
+        onError: (err) => {
+          console.error('PayPal error:', err);
+          setErrors({ submit: 'Payment gateway error. Please try again later.' });
+          setSubmitting(false);
+        }
+      }).render('#paypal-button-container');
+    } catch (err) {
+      console.error('Failed to render PayPal Buttons:', err);
+      setErrors({ submit: 'Failed to render payment widget. Please try again.' });
       setSubmitting(false);
     }
   };
@@ -186,7 +189,7 @@ const Checkout = () => {
           ? `Store Pickup at ${form.branch} Branch`
           : `${form.address1}${form.address2 ? ', ' + form.address2 : ''}, ${form.city}, ${form.state} ${form.postalCode}, ${form.country}`,
         phone: form.phone,
-        paymentMethod: form.paymentMethod === 'Online Payment' ? 'PayHere Online' : form.paymentMethod,
+        paymentMethod: form.paymentMethod === 'Online Payment' ? 'PayPal Online' : form.paymentMethod,
         orderType: form.orderType,
       };
 
@@ -246,20 +249,8 @@ const Checkout = () => {
           },
         });
       } else {
-        // Online Payment with PayHere
-        let merchantId = '1236112'; // Must match PAYHERE_MERCHANT_ID in backend .env
-        let sandboxMode = true;
-        try {
-          const configRes = await fetch(`${API_BASE}/api/config/payhere`);
-          if (configRes.ok) {
-            const configData = await configRes.json();
-            merchantId = configData.merchantId;
-            sandboxMode = configData.sandbox;
-          }
-        } catch {
-          // ignore config error, use sandbox fallback
-        }
-        await handlePayHerePayment(order, merchantId, sandboxMode);
+        // Online Payment with PayPal
+        await handlePayPalPayment(order);
       }
     } catch {
       setErrors({ submit: 'Failed to place order. Please try again.' });
@@ -378,13 +369,14 @@ const Checkout = () => {
                   {CURRENCY} {grandTotal.toLocaleString()}
                 </p>
                 <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.9, lineHeight: '1.4' }}>
-                  💳 Secure checkout via <strong>PayHere</strong> (supports local Cards, Genie, eZ Cash, mCash & Internet Banking).
+                  💳 Secure checkout via <strong>PayPal</strong>.
                 </p>
               </div>
             )}
 
+            <div id="paypal-button-container" style={{ marginBottom: '1rem' }} />
             <button type="submit" className="btn-primary checkout-submit" disabled={submitting} style={{ width: '100%', padding: '1rem' }}>
-              {submitting ? 'Processing...' : (form.paymentMethod === 'Online Payment' ? 'Pay with PayHere' : 'Place Order')}
+              {submitting ? 'Processing...' : (form.paymentMethod === 'Online Payment' ? 'Pay with PayPal' : 'Place Order')}
             </button>
           </aside>
         </form>
