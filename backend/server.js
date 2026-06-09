@@ -37,25 +37,7 @@ connectDB()
 
 const app = express();
 
-// PayHere config visibility (do not print secrets)
-const PAYHERE_MERCHANT_ID = process.env.PAYHERE_MERCHANT_ID || '1236112';
-// Support secrets provided either as plain text or base64-encoded in .env
-const PAYHERE_MERCHANT_SECRET_RAW = process.env.PAYHERE_MERCHANT_SECRET || '';
-let PAYHERE_MERCHANT_SECRET = PAYHERE_MERCHANT_SECRET_RAW;
-try {
-  // Detect base64 encoding: re-encode round-trip should equal original when valid base64
-  if (PAYHERE_MERCHANT_SECRET_RAW) {
-    const decoded = Buffer.from(PAYHERE_MERCHANT_SECRET_RAW, 'base64').toString('utf8');
-    const reencoded = Buffer.from(decoded, 'utf8').toString('base64');
-    if (reencoded === PAYHERE_MERCHANT_SECRET_RAW) {
-      PAYHERE_MERCHANT_SECRET = decoded;
-      console.log('[PayHere] Merchant secret detected as base64 in .env — decoded for use.');
-    }
-  }
-} catch (e) {
-  // If decoding fails, keep the raw value — we'll log presence only
-}
-console.log(`[PayHere] merchantId="${PAYHERE_MERCHANT_ID}" secretLength=${PAYHERE_MERCHANT_SECRET.length} secretConfigured=${!!PAYHERE_MERCHANT_SECRET}`);
+// Payment gateway configs handled separately (PayHere removed)
 
 // Build allowed origins from env var (comma-separated) + always include localhost for dev
 const productionOrigins = process.env.ALLOWED_ORIGINS
@@ -99,8 +81,6 @@ app.use((req, res, next) => {
     'http://localhost:5173',
     'https://www.paypal.com',
     'https://api.paypal.com',
-    'https://sandbox.payhere.lk',
-    'https://www.payhere.lk',
     ...(productionFrontend ? productionFrontend.split(',').map(o => o.trim()) : []),
     ...(productionBackend ? [productionBackend] : []),
   ].join(' ');
@@ -111,7 +91,7 @@ app.use((req, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   res.setHeader('Content-Security-Policy',
-    `default-src 'self'; connect-src ${connectSrc}; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://www.paypal.com https://www.payhere.lk https://sandbox.payhere.lk; frame-src https://www.paypal.com https://sandbox.payhere.lk https://www.payhere.lk; frame-ancestors 'none';`);
+    `default-src 'self'; connect-src ${connectSrc}; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://www.paypal.com; frame-src https://www.paypal.com; frame-ancestors 'none';`);
   next();
 });
 
@@ -525,97 +505,91 @@ app.put('/api/orders/:id/pay', async (req, res) => {
   }
 });
 
-// PayHere Secure Instant Payment Notification (IPN) callback
-app.post('/api/payments/payhere-notify', async (req, res) => {
-  const {
-    merchant_id,
-    order_id,
-    payment_id,
-    payhere_amount,
-    payhere_currency,
-    status_code,
-    md5sig
-  } = req.body;
+// PayHere webhook removed — PayPal integration in use instead.
 
-  console.log('[PayHere IPN] Received payment notification:', {
-    merchant_id,
-    order_id,
-    payment_id,
-    payhere_amount,
-    payhere_currency,
-    status_code,
-    has_signature: !!md5sig
+// PayPal configuration endpoint (client id exposed to frontend)
+app.get('/api/config/paypal', (req, res) => {
+  const clientId = process.env.PAYPAL_CLIENT_ID || 'sb';
+  const mode = process.env.PAYPAL_MODE === 'live' ? 'live' : 'sandbox';
+  res.json({ clientId, sandbox: mode !== 'live' });
+});
+
+const getPayPalBase = () => (process.env.PAYPAL_MODE === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com');
+
+async function getPayPalAccessToken() {
+  const clientId = process.env.PAYPAL_CLIENT_ID || '';
+  const clientSecret = process.env.PAYPAL_CLIENT_SECRET || '';
+  if (!clientId || !clientSecret) throw new Error('PayPal credentials not configured');
+
+  const tokenUrl = `${getPayPalBase()}/v1/oauth2/token`;
+  const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+  const resp = await fetch(tokenUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${basicAuth}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'grant_type=client_credentials'
   });
-
-  const localMerchantId = process.env.PAYHERE_MERCHANT_ID || '1236112';
-  if (merchant_id !== localMerchantId) {
-    console.error('[PayHere IPN] Merchant ID mismatch:', { received: merchant_id, expected: localMerchantId });
-    return res.status(400).send('Invalid merchant ID');
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => '');
+    throw new Error('PayPal token request failed: ' + txt);
   }
+  const data = await resp.json();
+  return data.access_token;
+}
 
-  const merchantSecret = PAYHERE_MERCHANT_SECRET || '';
-  if (merchantSecret) {
-    const hashedSecret = crypto.createHash('md5').update(merchantSecret).digest('hex').toUpperCase();
-    const hashString = merchant_id + order_id + payhere_amount + payhere_currency + status_code + hashedSecret;
-    const localMd5 = crypto.createHash('md5').update(hashString).digest('hex').toUpperCase();
-
-    if (localMd5 !== (md5sig || '').toUpperCase()) {
-      console.error('[PayHere IPN] Signature mismatch:', { expected: localMd5, received: md5sig });
-      return res.status(400).send('Invalid signature');
-    }
-  } else {
-    console.warn('[PayHere IPN] No merchant secret configured - skipping signature validation');
-  }
-
+// Create PayPal order (server-side)
+app.post('/api/payments/paypal/create-order', async (req, res) => {
   try {
-    const statusCode = Number(status_code);
-    const isSuccess = statusCode === 2;
-    const receivedAmount = Number(payhere_amount);
+    const { orderId, amount } = req.body;
+    if (!orderId || !amount) return res.status(400).json({ message: 'orderId and amount are required' });
 
-    if (isDBConnected()) {
-      const order = await Order.findById(order_id);
-      if (!order) {
-        return res.status(404).send('Order not found');
+    const token = await getPayPalAccessToken();
+    const createUrl = `${getPayPalBase()}/v2/checkout/orders`;
+    const body = {
+      intent: 'CAPTURE',
+      purchase_units: [{ amount: { currency_code: 'USD', value: String(amount) } }],
+      application_context: {
+        brand_name: 'Plantopia',
+        return_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/success`,
+        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout`
       }
+    };
 
-      if (Number.isFinite(receivedAmount) && Math.abs(order.total - receivedAmount) > 0.01) {
-        return res.status(400).send('Amount mismatch');
-      }
-
-      if (isSuccess) {
-        order.isPaid = true;
-        order.paidAt = Date.now();
-        order.status = 'paid';
-        order.paymentResult = {
-          id: payment_id,
-          status: 'completed',
-          update_time: new Date().toISOString(),
-        };
-        await order.save();
-        // Trigger Confirmation Notification
-        notifyOrderConfirmed(order).catch(err => console.error('Notification Error:', err));
-      } else {
-        order.status = 'failed';
-        await order.save();
-      }
-    } else {
-      const order = inMemoryOrders.find(o => o.id === order_id);
-      if (order) {
-        if (isSuccess) {
-          order.isPaid = true;
-          order.paidAt = new Date();
-          order.status = 'paid';
-          // Trigger Notification
-          notifyOrderConfirmed(order).catch(err => console.error('Notification Error:', err));
-        } else {
-          order.status = 'failed';
-        }
-      }
+    const resp = await fetch(createUrl, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => '');
+      return res.status(500).json({ message: 'Failed to create PayPal order: ' + txt });
     }
-
-    res.send('OK');
+    const data = await resp.json();
+    res.json({ id: data.id, links: data.links });
   } catch (error) {
-    res.status(500).send('Server Error: ' + error.message);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Capture PayPal order (server-side)
+app.post('/api/payments/paypal/capture-order', async (req, res) => {
+  try {
+    const { paypalOrderId } = req.body;
+    if (!paypalOrderId) return res.status(400).json({ message: 'paypalOrderId is required' });
+
+    const token = await getPayPalAccessToken();
+    const capUrl = `${getPayPalBase()}/v2/checkout/orders/${paypalOrderId}/capture`;
+    const resp = await fetch(capUrl, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+    });
+    const data = await resp.json();
+    if (!resp.ok) return res.status(500).json({ message: data.message || JSON.stringify(data) });
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -667,47 +641,7 @@ app.put('/api/orders/:id/status', async (req, res) => {
   }
 });
 
-app.get('/api/config/payhere', (req, res) => {
-  res.json({
-    merchantId: process.env.PAYHERE_MERCHANT_ID || '1236112',
-    sandbox: process.env.NODE_ENV !== 'production'
-  });
-});
-
-// Generate PayHere payment hash server-side (merchant secret never sent to browser)
-app.post('/api/payments/payhere-hash', (req, res) => {
-  const { merchant_id, order_id, amount, currency } = req.body;
-
-  if (!merchant_id || !order_id || !amount || !currency) {
-    return res.status(400).json({ message: 'merchant_id, order_id, amount, and currency are required.' });
-  }
-
-  const merchantSecret = PAYHERE_MERCHANT_SECRET || '';
-  if (!merchantSecret) {
-    return res.status(500).json({ message: 'PayHere merchant secret is not configured on the server.' });
-  }
-
-  // Log input for debugging (non-secret data only)
-  try {
-    const formattedAmount = parseFloat(amount).toFixed(2);
-    console.log('[PayHere Hash] request:', { merchant_id, order_id, amount, formattedAmount, currency });
-  } catch (e) {
-    console.warn('[PayHere Hash] Unable to parse amount for logging:', amount);
-  }
-
-  // PayHere hash formula: MD5( merchant_id + order_id + amount + currency + MD5(secret).toUpperCase() ).toUpperCase()
-  const hashedSecret = crypto.createHash('md5').update(merchantSecret).digest('hex').toUpperCase();
-  const formattedAmount = parseFloat(amount).toFixed(2);
-  const hashInput = merchant_id + order_id + formattedAmount + currency + hashedSecret;
-  const hash = crypto.createHash('md5').update(hashInput).digest('hex').toUpperCase();
-
-  console.log('[PayHere Hash] Generated hash for order:', order_id, '| amount:', formattedAmount);
-  res.json({ hash });
-});
-
-// Debug endpoint: compute PayHere MD5 using server-side merchant secret
-// (temporary - safe to remove after debugging)
-// debug endpoint removed
+// PayHere endpoints removed — PayPal handles online payments now.
 
 
 app.get('/api/orders', async (req, res) => {
