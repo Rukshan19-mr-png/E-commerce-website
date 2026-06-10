@@ -1,7 +1,6 @@
-import { connect } from 'mongoose';
+const { connect } = require('mongoose');
 
 const maskUriCredentials = (uri) => {
-  // Replace credentials between // and @ with masked placeholder
   return uri.replace(/\/\/(.*@)/, '//***@');
 };
 
@@ -34,7 +33,6 @@ const connectDB = async () => {
   } catch (error) {
     console.error(`MongoDB connection failed: ${error.message}`);
     console.warn('Continuing without MongoDB. API routes will still work from static data.');
-    // Provide helpful hint for common Atlas issue
     if (error.message && error.message.toLowerCase().includes('whitelist')) {
       console.warn('If you are using MongoDB Atlas, ensure your current IP is added to the Cluster Network Access IP list.');
     }
@@ -42,4 +40,4 @@ const connectDB = async () => {
   }
 };
 
-export default connectDB;
+module.exports = connectDB;

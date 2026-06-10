@@ -5,7 +5,7 @@ const products = require('./data/products');
 const User = require('./models/User');
 const Product = require('./models/Product');
 const Order = require('./models/Order');
-const connectDB = require('./config/db').default;
+const connectDB = require('./config/db');
 
 // Load env vars
 dotenv.config();

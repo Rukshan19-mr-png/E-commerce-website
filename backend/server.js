@@ -20,7 +20,7 @@ const staticUsers = require('./data/users');
 const inMemoryOrders = [];
 const inMemoryResetCodes = {}; // { email: { code, expire } }
 
-const connectDB = require('./config/db').default;
+const connectDB = require('./config/db');
 
 // Attempt DB connection before starting server so logs reflect real state
 let dbConnected = false;

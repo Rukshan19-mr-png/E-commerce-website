@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE, DELIVERY_FEE, CURRENCY } from '../utils/constants';
+import { API_BASE, DELIVERY_FEE, CURRENCY, LKR_TO_USD_RATE } from '../utils/constants';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -64,7 +64,8 @@ const Checkout = () => {
 
   const handlePayPalPayment = async (order) => {
     const orderId = order.id || order._id;
-    const amount = grandTotal.toFixed(2);
+    const amountInUSD = (grandTotal * LKR_TO_USD_RATE).toFixed(2);
+    const amount = amountInUSD;
 
     // Get PayPal client id from backend
     let clientId = 'sb';
@@ -366,7 +367,7 @@ const Checkout = () => {
               }}>
                 <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>Total to Pay:</p>
                 <p style={{ margin: '0.25rem 0', fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>
-                  {CURRENCY} {grandTotal.toLocaleString()}
+                  {CURRENCY} {grandTotal.toLocaleString()} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>(approx. ${(grandTotal * LKR_TO_USD_RATE).toFixed(2)} USD)</span>
                 </p>
                 <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.9, lineHeight: '1.4' }}>
                   💳 Secure checkout via <strong>PayPal</strong>.
