@@ -25,7 +25,7 @@ export const CartProvider = ({ children }) => {
             updated = updated.filter((c) => (c.id || c._id) !== (item.id || item._id));
             removed.push({ name: item.name, available });
           }
-        } catch (err) {
+        } catch {
           // ignore network errors for individual items
         }
       }
@@ -60,7 +60,7 @@ export const CartProvider = ({ children }) => {
         alert('This product is currently out of stock.');
         return;
       }
-    } catch (err) {
+    } catch {
       // if check fails, allow add and let backend validate on order
     }
 
@@ -106,4 +106,5 @@ export const CartProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => useContext(CartContext);
