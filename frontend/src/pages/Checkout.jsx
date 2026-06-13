@@ -75,14 +75,14 @@ const Checkout = () => {
         const cfgData = await cfg.json();
         clientId = cfgData.clientId || clientId;
       }
-    } catch (e) {
+    } catch {
       console.warn('Failed to fetch PayPal config, falling back to sandbox client id');
     }
 
     const sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
     try {
       await loadScript(sdkUrl);
-    } catch (err) {
+    } catch {
       setErrors({ submit: 'Failed to load PayPal SDK. Please try again later.' });
       setSubmitting(false);
       return;
@@ -111,9 +111,10 @@ const Checkout = () => {
       const container = document.getElementById('paypal-button-container');
       if (container) container.innerHTML = '';
 
-      // eslint-disable-next-line no-undef
+       
       window.paypal.Buttons({
         createOrder: () => paypalOrderId,
+        // eslint-disable-next-line no-unused-vars
         onApprove: async (_data, actions) => {
           try {
             const capRes = await fetch(`${API_BASE}/api/payments/paypal/capture-order`, {
@@ -207,7 +208,7 @@ const Checkout = () => {
               return;
             }
           }
-        } catch (err) {
+        } catch {
           // ignore individual product check errors and continue; backend will still validate
         }
       }
@@ -228,7 +229,7 @@ const Checkout = () => {
           const errBody = await response.json();
           if (errBody && errBody.message) errMsg = errBody.message;
           else if (typeof errBody === 'string') errMsg = errBody;
-        } catch (e) {
+        } catch {
           // ignore parse errors and use fallback message
         }
         setErrors({ submit: errMsg });
