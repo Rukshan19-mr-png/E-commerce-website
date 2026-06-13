@@ -28,11 +28,13 @@ connectDB()
   .then(() => { dbConnected = true; })
   .catch(() => { dbConnected = false; })
   .finally(() => {
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`MongoDB connected: ${dbConnected}`);
-    });
+    if (!process.env.VERCEL) {
+      const PORT = process.env.PORT || 5000;
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`MongoDB connected: ${dbConnected}`);
+      });
+    }
   });
 
 const app = express();
@@ -718,4 +720,5 @@ app.put('/api/products/:id/stock', async (req, res) => {
 
 // NOTE: server is started in connectDB() finally handler above.
 
+module.exports = app;
 
