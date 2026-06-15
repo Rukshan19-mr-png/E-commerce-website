@@ -15,7 +15,24 @@ A premium MERN stack e-commerce platform for rare and endemic plants in Sri Lank
 2. Install dependencies for both frontend and backend
 3. Create a `.env` file in the `backend` folder (see `backend/.env.example`)
 4. Create a `.env.local` file in the `frontend` folder (see `frontend/.env.example`)
-5. Start the development servers with `npm run dev` (frontend) and `npm start` (backend)
+
+Quick development steps:
+
+- Install backend dependencies and start the server:
+
+	```bash
+	cd backend
+	npm install
+	npm start
+	```
+
+- Install frontend dependencies and start the Vite dev server:
+
+	```bash
+	cd frontend
+	npm install
+	npm run dev
+	```
 
 ## Deployment & environment variables
 For production deployment, follow the deployment guide in `DEPLOYMENT.md`.
@@ -43,3 +60,5 @@ To enable notifications, ensure the following keys are set in your backend `.env
 - `TWILIO_SID`: Your Twilio Account SID
 - `TWILIO_AUTH_TOKEN`: Your Twilio Auth Token
 - `TWILIO_PHONE_NUMBER`: Your Twilio phone number
+
+If you need to run the frontend and backend concurrently during development, you can use a terminal multiplexer (two terminals) or a tool like `concurrently` from npm (install it globally or as a dev dependency).
