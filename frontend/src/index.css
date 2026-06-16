@@ -271,15 +271,34 @@ header {
   justify-content: center;
   text-align: center;
   padding: 4rem 2rem;
-  background: var(--hero-overlay), url('/images/plants/3d_plants_hero.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: scroll;
-  margin: 1.5rem;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  background: var(--hero-overlay);
+  margin: 0; /* full-bleed horizontally */
+  border-radius: 0; /* remove rounded corners so video reaches edges */
+  box-shadow: none;
   position: relative;
   overflow: hidden;
+}
+
+/* Hero video styles */
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw; /* span full viewport width */
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.1) contrast(1.04);
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero::after {
+  z-index: 1;
 }
 
 /* Decorative hero plant image */
