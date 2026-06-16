@@ -58,6 +58,15 @@ const Home = () => {
   return (
     <main>
       <div className="hero">
+        <video
+          className="hero-video"
+          src="/videos/hero.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/images/plants/3d_plants_hero.png"
+        />
         <motion.div
           className="hero-content"
           initial={{ opacity: 0, y: 30 }}
