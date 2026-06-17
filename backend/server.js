@@ -1,3 +1,11 @@
+const dns = require('dns');
+// Set DNS servers to Google's public DNS to bypass local Windows DNS resolution issues for MongoDB Atlas SRV records
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (e) {
+  console.warn('Unable to set custom DNS servers:', e.message);
+}
+
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
