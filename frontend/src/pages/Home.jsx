@@ -9,7 +9,20 @@ const Home = () => {
   const [apiMessage, setApiMessage] = useState('Connecting to backend...');
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterMsg, setNewsletterMsg] = useState('');
   const navigate = useNavigate();
+
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail)) {
+      setNewsletterMsg('⚠️ Please enter a valid email address.');
+      return;
+    }
+    setNewsletterMsg('✅ Thank you for subscribing! We\'ll be in touch soon.');
+    setNewsletterEmail('');
+    setTimeout(() => setNewsletterMsg(''), 5000);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -185,14 +198,23 @@ const Home = () => {
           <p style={{ fontSize: '1.2rem', opacity: 0.8, maxWidth: '700px', margin: '0 auto 3rem' }}>
             Subscribe to get care tips, exclusive offers, and early access to rare plant drops.
           </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', maxWidth: '500px', margin: '0 auto' }}>
-            <input 
-              type="email" 
-              placeholder="Your email address" 
-              style={{ padding: '16px 24px', borderRadius: '40px', border: 'none', flex: 1, fontSize: '1rem' }}
-            />
-            <button className="btn-primary" style={{ background: 'var(--accent)', color: 'var(--primary-dark)' }}>Subscribe</button>
-          </div>
+          <form onSubmit={handleNewsletterSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', maxWidth: '500px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
+              <input
+                type="email"
+                placeholder="Your email address"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                style={{ padding: '16px 24px', borderRadius: '40px', border: 'none', flex: 1, fontSize: '1rem' }}
+              />
+              <button type="submit" className="btn-primary" style={{ background: 'var(--accent)', color: 'var(--primary-dark)' }}>Subscribe</button>
+            </div>
+            {newsletterMsg && (
+              <p style={{ margin: 0, fontSize: '0.95rem', color: newsletterMsg.startsWith('✅') ? '#b7e4c7' : '#ffb3b3', fontWeight: 600 }}>
+                {newsletterMsg}
+              </p>
+            )}
+          </form>
         </div>
       </section>
     </main>

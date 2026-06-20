@@ -7,6 +7,7 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -25,11 +26,14 @@ const ForgotPassword = () => {
       if (!res.ok) throw new Error(data.message);
       
       setMessage(data.message);
+      if (data.previewUrl) {
+        setPreviewUrl(data.previewUrl);
+      }
       sessionStorage.setItem('plantopiaResetEmail', email);
       // Navigate to reset password page after a brief delay
       setTimeout(() => {
         navigate('/reset-password', { state: { email } });
-      }, 2000);
+      }, 4000); // Increased delay so user has time to click the link
     } catch (err) {
       setError(err.message);
     } finally {
@@ -47,7 +51,13 @@ const ForgotPassword = () => {
 
         {message && (
           <div style={{ background: 'rgba(45, 106, 79, 0.1)', color: 'var(--primary-dark)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem', border: '1px solid var(--primary-light)' }}>
-            ✅ {message} Redirecting...
+            ✅ {message}
+            {previewUrl && (
+              <div style={{ marginTop: '0.5rem', padding: '0.5rem', background: '#fff', borderRadius: '8px' }}>
+                <a href={previewUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', fontWeight: 600 }}>👉 Click here to view the email (Test Mode)</a>
+              </div>
+            )}
+            <div style={{ marginTop: '0.5rem' }}>Redirecting...</div>
           </div>
         )}
         {error && <div style={{ background: '#f8d7da', color: '#842029', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>⚠️ {error}</div>}

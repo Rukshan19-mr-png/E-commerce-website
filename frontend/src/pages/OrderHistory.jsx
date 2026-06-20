@@ -120,8 +120,22 @@ const OrderHistory = () => {
                 
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ 
-                    background: order.status === 'pending' ? '#fff3cd' : '#d1e7dd', 
-                    color: order.status === 'pending' ? '#856404' : '#0f5132',
+                    background: (() => {
+                      const s = order.status?.toLowerCase();
+                      if (s === 'pending')   return '#fff3cd';
+                      if (s === 'packing')   return '#ffe5cc';
+                      if (s === 'shipping')  return '#cce5ff';
+                      if (s === 'paid')      return '#d1f0ea';
+                      return '#d1e7dd'; // delivered / default
+                    })(), 
+                    color: (() => {
+                      const s = order.status?.toLowerCase();
+                      if (s === 'pending')   return '#856404';
+                      if (s === 'packing')   return '#7d4000';
+                      if (s === 'shipping')  return '#004085';
+                      if (s === 'paid')      return '#0a6654';
+                      return '#0f5132'; // delivered / default
+                    })(),
                     padding: '4px 12px',
                     borderRadius: '20px',
                     fontSize: '0.85rem',

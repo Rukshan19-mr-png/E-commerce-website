@@ -8,11 +8,10 @@ const Delivery = () => {
   const [loading, setLoading] = useState(() => !!auth?.token);
   const [error, setError] = useState(null);
 
-  const [prevAuthToken, setPrevAuthToken] = useState(auth?.token);
-  if (auth?.token !== prevAuthToken) {
-    setPrevAuthToken(auth?.token);
+  // Reset loading state when auth token changes (idiomatic useEffect approach)
+  useEffect(() => {
     setLoading(!!auth?.token);
-  }
+  }, [auth?.token]);
 
   useEffect(() => {
     const fetchOrders = async () => {

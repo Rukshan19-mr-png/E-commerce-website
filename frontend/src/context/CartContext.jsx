@@ -78,14 +78,14 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = (productId) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
+    setCart((prev) => prev.filter((item) => (item.id || item._id) !== productId));
   };
 
   const updateQuantity = (productId, delta) => {
     setCart((prev) =>
       prev
         .map((item) =>
-          item.id === productId
+          (item.id || item._id) === productId
             ? { ...item, quantity: Math.max(1, item.quantity + delta) }
             : item
         )

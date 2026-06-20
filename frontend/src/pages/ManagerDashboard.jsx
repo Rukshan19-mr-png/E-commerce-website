@@ -28,7 +28,7 @@ const ManagerDashboard = () => {
         setProducts(productsData || []);
         setStockInputs(
           (productsData || []).reduce((acc, product) => {
-            acc[product.id] = product.countInStock;
+            acc[product.id || product._id] = product.countInStock;
             return acc;
           }, {})
         );
@@ -129,15 +129,15 @@ const ManagerDashboard = () => {
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <input
                     type="number"
-                    value={stockInputs[product.id] ?? product.countInStock}
-                    onChange={(e) => setStockInputs((prev) => ({ ...prev, [product.id]: e.target.value }))}
+                    value={stockInputs[product.id || product._id] ?? product.countInStock}
+                    onChange={(e) => setStockInputs((prev) => ({ ...prev, [product.id || product._id]: e.target.value }))}
                     style={{ width: '70px', padding: '6px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)' }}
                   />
                   <button
                     className="btn-primary"
                     style={{ padding: '6px 12px', fontSize: '0.8rem' }}
-                    onClick={() => handleUpdateStock(product.id, stockInputs[product.id])}
-                    disabled={updating === product.id}
+                    onClick={() => handleUpdateStock(product.id || product._id, stockInputs[product.id || product._id])}
+                    disabled={updating === (product.id || product._id)}
                   >
                     Update
                   </button>

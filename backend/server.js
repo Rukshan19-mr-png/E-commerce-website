@@ -30,21 +30,6 @@ const inMemoryResetCodes = {}; // { email: { code, expire } }
 
 const connectDB = require('./config/db');
 
-// Attempt DB connection before starting server so logs reflect real state
-let dbConnected = false;
-connectDB()
-  .then(() => { dbConnected = true; })
-  .catch(() => { dbConnected = false; })
-  .finally(() => {
-    if (!process.env.VERCEL) {
-      const PORT = process.env.PORT || 5000;
-      app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-        console.log(`MongoDB connected: ${dbConnected}`);
-      });
-    }
-  });
-
 const app = express();
 
 // Payment gateway configs handled separately (PayHere removed)
@@ -74,6 +59,22 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Attempt DB connection before starting server so logs reflect real state
+let dbConnected = false;
+connectDB()
+  .then(() => { dbConnected = true; })
+  .catch(() => { dbConnected = false; })
+  .finally(() => {
+    if (!process.env.VERCEL) {
+      const PORT = process.env.PORT || 5000;
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`MongoDB connected: ${dbConnected}`);
+      });
+    }
+  });
+
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -260,8 +261,11 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     }
 
     // Send Code via Email (Both for DB and Mock)
-    await sendResetCode(email, resetCode);
-    res.json({ message: 'Verification code sent to your email.' });
+    const emailResult = await sendResetCode(email, resetCode);
+    res.json({ 
+      message: 'Verification code sent to your email.',
+      previewUrl: emailResult?.previewUrl
+    });
     
   } catch (error) {
     res.status(500).json({ message: 'Server Error: ' + error.message });

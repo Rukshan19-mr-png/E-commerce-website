@@ -14,33 +14,61 @@ const isEmailConfigured = () => {
   return user && pass && !user.includes('your-email') && !pass.includes('your-app-password');
 };
 
-const getTransporter = () => nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+let testAccountCache = null;
+
+const getTransporter = async () => {
+  if (isEmailConfigured()) {
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+  } else {
+    if (!testAccountCache) {
+      testAccountCache = await nodemailer.createTestAccount();
+    }
+    return nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false,
+      auth: {
+        user: testAccountCache.user,
+        pass: testAccountCache.pass,
+      },
+    });
+  }
+};
 
 /**
- * Send Email Notification (skips gracefully if credentials not configured)
+ * Send Email Notification (uses Ethereal if credentials not configured)
  */
 const sendEmail = async (to, subject, text, html) => {
-  if (!isEmailConfigured()) {
-    console.log(`[EMAIL MOCK - no SMTP config] To: ${to} | Subject: ${subject}`);
-    return;
-  }
   try {
-    const info = await getTransporter().sendMail({
-      from: `"Plantopia Sri Lanka" <${process.env.EMAIL_USER}>`,
+    const transporter = await getTransporter();
+    const fromAddress = isEmailConfigured() ? `"Plantopia Sri Lanka" <${process.env.EMAIL_USER}>` : '"Plantopia Test" <test@plantopia.com>';
+    
+    const info = await transporter.sendMail({
+      from: fromAddress,
       to,
       subject,
       text,
       html,
     });
+    
     console.log(`Email sent: ${info.messageId}`);
+    
+    if (!isEmailConfigured()) {
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+      console.log(`Preview URL: ${previewUrl}`);
+      return { success: true, previewUrl };
+    }
+    
+    return { success: true };
   } catch (error) {
     console.error('Email Error:', error.message);
+    return { success: false, error: error.message };
   }
 };
 
@@ -139,7 +167,7 @@ const sendResetCode = async (email, code) => {
     </div>
   `;
 
-  await sendEmail(email, subject, message, html);
+  return await sendEmail(email, subject, message, html);
 };
 
 module.exports = { notifyOrderConfirmed, notifyOrderDelivered, sendResetCode };

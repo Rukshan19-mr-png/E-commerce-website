@@ -27,11 +27,11 @@ const Cart = () => {
                   
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                     <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                      <button className="btn-secondary" onClick={() => updateQuantity(item.id, -1)} disabled={item.quantity <= 1} style={{ padding: '4px 12px' }}>-</button>
+                      <button className="btn-secondary" onClick={() => updateQuantity(item.id || item._id, -1)} disabled={item.quantity <= 1} style={{ padding: '4px 12px' }}>-</button>
                       <span style={{ fontWeight: 700, minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
-                      <button className="btn-secondary" onClick={() => updateQuantity(item.id, 1)} style={{ padding: '4px 12px' }}>+</button>
+                      <button className="btn-secondary" onClick={() => updateQuantity(item.id || item._id, 1)} style={{ padding: '4px 12px' }}>+</button>
                     </div>
-                    <button className="btn-danger" onClick={() => removeFromCart(item.id)} style={{ fontSize: '0.85rem' }}>Remove</button>
+                    <button className="btn-danger" onClick={() => removeFromCart(item.id || item._id)} style={{ fontSize: '0.85rem' }}>Remove</button>
                   </div>
                 </div>
               </div>
@@ -48,6 +48,9 @@ const Cart = () => {
               <span>Delivery Fee</span>
               <span style={{ fontWeight: 600 }}>{CURRENCY} {DELIVERY_FEE.toLocaleString()}</span>
             </div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontStyle: 'italic' }}>
+              * Waived for Store Pickup — set at Checkout
+            </p>
             <div className="summary-row total">
               <span>Total</span>
               <span>{CURRENCY} {(cartTotal + DELIVERY_FEE).toLocaleString()}</span>
