@@ -949,6 +949,11 @@ const products = [
   "description": "Known for its iconic natural leaf fenestrations, this vibrant tropical plant brings a lush feel to any room.",
   "image": "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600"
   },
+  {
+  "name": "Snake Plant (Sansevieria)",
+  "description": "A sleek, structural plant with upright sword-like leaves that thrives on neglect and cleans indoor air.",
+  "image": "https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600"
+  ,}
 ];
 
 module.exports = products;
