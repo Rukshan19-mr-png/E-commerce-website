@@ -953,6 +953,11 @@ const products = [
   "name": "Snake Plant (Sansevieria)",
   "description": "A sleek, structural plant with upright sword-like leaves that thrives on neglect and cleans indoor air.",
   "image": "https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600"
+  },
+  {
+  "name": "Fiddle Leaf Fig",
+  "description": "Features large, dramatic violin-shaped leaves with prominent veins. A stunning statement piece for bright spaces.",
+  "image": "https://images.unsplash.com/photo-1597055181300-e3633a207518?auto=format&fit=crop&q=80&w=600"
   ,}
 ];
 
