@@ -963,7 +963,7 @@ const products = [
   "name": "Golden Pothos",
   "description": "A beautiful trailing vine with heart-shaped, variegated green and yellow leaves that drapes elegantly from shelves.",
   "image": "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&q=80&w=600"
-},
+  }
 ];
 
 module.exports = products;
