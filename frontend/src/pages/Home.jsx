@@ -63,23 +63,14 @@ const Home = () => {
   ];
 
   const categories = [
-    { title: 'Flower Plants', img: 'https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&q=80&w=800' },
+    { title: 'Flower Plants', img: '/images/plants/flower_plants.png' },
     { title: 'Fruit Plants', img: '/images/plants/dragon_fruit.png' },
     { title: 'Other Plants', img: '/images/plants/money_tree.png' },
   ];
 
   return (
     <main>
-      <div className="hero">
-        <video
-          className="hero-video"
-          src="/videos/hero.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/images/plants/3d_plants_hero.png"
-        />
+      <div className="hero" style={{ backgroundImage: "url('/images/hero-bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <motion.div
           className="hero-content"
           initial={{ opacity: 0, y: 30 }}
