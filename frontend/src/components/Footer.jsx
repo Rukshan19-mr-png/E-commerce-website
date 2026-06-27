@@ -21,7 +21,7 @@ const Footer = () => {
             <div style={{ display: 'grid', gap: '0.5rem' }}>
               <h4 style={{ marginBottom: '0.5rem' }}>Support</h4>
               <p>Kadawatha Branch (Main)</p>
-              <p style={{ fontSize: '0.9rem' }}>📞 Hotline: +94 77 123 4567</p>
+              <p style={{ fontSize: '0.9rem' }}>📞 Hotline: +94 77 887 0865</p>
               <p style={{ fontSize: '0.9rem' }}>📧 Email: info@plantopia.lk</p>
               <a href="https://facebook.com/plantopia" target="_blank" rel="noreferrer" style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 600 }}>
                 🌐 Visit our Facebook
