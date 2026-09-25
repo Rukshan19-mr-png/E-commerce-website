@@ -1,4 +1,4 @@
-const { connect } = require('mongoose');
+const mongoose = require('mongoose');
 
 const maskUriCredentials = (uri) => {
   return uri.replace(/\/\/(.*@)/, '//***@');
@@ -15,6 +15,8 @@ const extractHostInfo = (uri) => {
   }
 };
 
+let cachedPromise = null;
+
 const connectDB = async () => {
   const uri = process.env.MONGO_URI;
   if (!uri) {
@@ -22,22 +24,35 @@ const connectDB = async () => {
     return Promise.resolve(false);
   }
 
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (cachedPromise) {
+    return cachedPromise;
+  }
+
   const masked = maskUriCredentials(uri);
   const hostInfo = extractHostInfo(uri);
   console.log(`Attempting MongoDB connection to: ${hostInfo} (credentials masked: ${masked})`);
 
-  try {
-    const conn = await connect(uri);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-    return conn;
-  } catch (error) {
-    console.error(`MongoDB connection failed: ${error.message}`);
-    console.warn('Continuing without MongoDB. API routes will still work from static data.');
-    if (error.message && error.message.toLowerCase().includes('whitelist')) {
-      console.warn('If you are using MongoDB Atlas, ensure your current IP is added to the Cluster Network Access IP list.');
-    }
-    return Promise.reject(error);
-  }
+  cachedPromise = mongoose.connect(uri)
+    .then((conn) => {
+      console.log(`MongoDB Connected: ${conn.connection.host}`);
+      return conn;
+    })
+    .catch((error) => {
+      cachedPromise = null;
+      console.error(`MongoDB connection failed: ${error.message}`);
+      console.warn('Continuing without MongoDB. API routes will still work from static data.');
+      if (error.message && error.message.toLowerCase().includes('whitelist')) {
+        console.warn('If you are using MongoDB Atlas, ensure your current IP is added to the Cluster Network Access IP list.');
+      }
+      return Promise.reject(error);
+    });
+
+  return cachedPromise;
 };
 
 module.exports = connectDB;
+

@@ -51,7 +51,12 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (e.g. mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.vercel.app')
+    ) {
+      return callback(null, true);
+    }
     callback(new Error(`CORS: Origin ${origin} not allowed`));
   },
   credentials: true,
@@ -59,6 +64,18 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Ensure database is connected for serverless invocations
+app.use(async (req, res, next) => {
+  if (process.env.MONGO_URI && mongoose.connection.readyState === 0) {
+    try {
+      await connectDB();
+    } catch (e) {
+      // ConnectDB logs failure and continues with static fallback
+    }
+  }
+  next();
+});
 
 // Attempt DB connection before starting server so logs reflect real state
 let dbConnected = false;
@@ -107,6 +124,10 @@ app.use((req, res, next) => {
 });
 
 const isDBConnected = () => mongoose.connection.readyState === 1;
+
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to Plantopia API! 🌿' });
+});
 
 app.get('/api', (req, res) => {
   res.json({ message: 'Welcome to Plantopia API! 🌿' });

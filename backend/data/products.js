@@ -943,26 +943,58 @@ const products = [
     "lightRequirement": "Direct Sun",
     "petFriendly": true,
     "wateringFrequency": "Daily"
-  }
-  {
-  "name": "Monstera Deliciosa",
-  "description": "Known for its iconic natural leaf fenestrations, this vibrant tropical plant brings a lush feel to any room.",
-  "image": "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600"
   },
   {
-  "name": "Snake Plant (Sansevieria)",
-  "description": "A sleek, structural plant with upright sword-like leaves that thrives on neglect and cleans indoor air.",
-  "image": "https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600"
+    "id": "68",
+    "name": "Monstera Deliciosa",
+    "description": "Known for its iconic natural leaf fenestrations, this vibrant tropical plant brings a lush feel to any room.",
+    "image": "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600",
+    "images": ["https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600"],
+    "category": "Other",
+    "price": 1200,
+    "countInStock": 10,
+    "lightRequirement": "Indirect Light",
+    "petFriendly": false,
+    "wateringFrequency": "Weekly"
   },
   {
-  "name": "Fiddle Leaf Fig",
-  "description": "Features large, dramatic violin-shaped leaves with prominent veins. A stunning statement piece for bright spaces.",
-  "image": "https://images.unsplash.com/photo-1597055181300-e3633a207518?auto=format&fit=crop&q=80&w=600"
+    "id": "69",
+    "name": "Snake Plant (Sansevieria)",
+    "description": "A sleek, structural plant with upright sword-like leaves that thrives on neglect and cleans indoor air.",
+    "image": "https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600",
+    "images": ["https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600"],
+    "category": "Other",
+    "price": 850,
+    "countInStock": 15,
+    "lightRequirement": "Low to Bright",
+    "petFriendly": false,
+    "wateringFrequency": "Bi-weekly"
   },
   {
-  "name": "Golden Pothos",
-  "description": "A beautiful trailing vine with heart-shaped, variegated green and yellow leaves that drapes elegantly from shelves.",
-  "image": "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&q=80&w=600"
+    "id": "70",
+    "name": "Fiddle Leaf Fig",
+    "description": "Features large, dramatic violin-shaped leaves with prominent veins. A stunning statement piece for bright spaces.",
+    "image": "https://images.unsplash.com/photo-1597055181300-e3633a207518?auto=format&fit=crop&q=80&w=600",
+    "images": ["https://images.unsplash.com/photo-1597055181300-e3633a207518?auto=format&fit=crop&q=80&w=600"],
+    "category": "Other",
+    "price": 2100,
+    "countInStock": 8,
+    "lightRequirement": "Bright Indirect",
+    "petFriendly": false,
+    "wateringFrequency": "Weekly"
+  },
+  {
+    "id": "71",
+    "name": "Golden Pothos",
+    "description": "A beautiful trailing vine with heart-shaped, variegated green and yellow leaves that drapes elegantly from shelves.",
+    "image": "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&q=80&w=600",
+    "images": ["https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&q=80&w=600"],
+    "category": "Other",
+    "price": 650,
+    "countInStock": 20,
+    "lightRequirement": "Low to Bright",
+    "petFriendly": false,
+    "wateringFrequency": "Weekly"
   }
 ];
 
