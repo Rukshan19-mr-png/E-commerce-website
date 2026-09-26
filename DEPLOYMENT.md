@@ -36,6 +36,13 @@ Required values in `frontend/.env.local`:
 - `VITE_API_URL`: `https://api.yourdomain.com` or your actual backend URL.
 - `VITE_PAYPAL_CLIENT_ID`: Your PayPal client ID for production.
 
+Set `VITE_API_URL` in the frontend's Vercel project to
+`https://plantopia-backend-9ef0a5sjb-rukshan19-mr-pngs-projects.vercel.app`,
+with no `/api` suffix.
+Vite embeds this value at build time, so redeploy the frontend after changing it.
+The frontend source has this deployed URL as its production default. The Vercel
+environment variable can override it when needed.
+
 ## 4. Production deployment checklist
 
 1. Build both apps:
