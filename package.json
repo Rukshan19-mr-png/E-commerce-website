@@ -4,7 +4,7 @@
   "description": "A premium MERN stack e-commerce platform for rare and endemic plants in Sri Lanka.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm --prefix backend test"
   },
   "keywords": [],
   "author": "",
