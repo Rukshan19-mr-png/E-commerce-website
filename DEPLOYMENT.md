@@ -48,6 +48,11 @@ In MongoDB Atlas, create a database user, allow network access from Vercel (Atla
    |---|---|
    | `VITE_API_URL` | The backend production URL from step 2, e.g. `https://plantopia-api.vercel.app` |
 
+   The frontend source defaults to
+   `https://plantopia-backend-9ef0a5sjb-rukshan19-mr-pngs-projects.vercel.app`
+   when no value is configured. Set the variable to your backend's production
+   URL if it differs; do not include an `/api` suffix.
+
 5. Deploy the frontend and copy its production domain.
 
 `VITE_API_URL` is embedded during the frontend build. If you change it later, redeploy the frontend.

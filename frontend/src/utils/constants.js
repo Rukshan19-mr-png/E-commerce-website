@@ -1,4 +1,10 @@
-const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// In production the API is served by the separate backend deployment. Requiring
+// its URL here prevents a missing Vercel setting from silently calling the
+// visitor's localhost. Local development continues to use Vite's /api proxy.
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+const rawApiUrl = configuredApiUrl || (import.meta.env.DEV
+  ? ''
+  : 'https://plantopia-backend-9ef0a5sjb-rukshan19-mr-pngs-projects.vercel.app');
 const apiUrlWithoutTrailingSlash = rawApiUrl.replace(/\/+$/, '');
 export const API_BASE = apiUrlWithoutTrailingSlash.endsWith('/api')
   ? apiUrlWithoutTrailingSlash.slice(0, -4)
