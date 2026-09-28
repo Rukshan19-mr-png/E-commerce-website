@@ -1,5 +1,8 @@
 const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-export const API_BASE = rawApiUrl.endsWith('/api') ? rawApiUrl.slice(0, -4) : rawApiUrl.endsWith('/api/') ? rawApiUrl.slice(0, -5) : rawApiUrl;
+const apiUrlWithoutTrailingSlash = rawApiUrl.replace(/\/+$/, '');
+export const API_BASE = apiUrlWithoutTrailingSlash.endsWith('/api')
+  ? apiUrlWithoutTrailingSlash.slice(0, -4)
+  : apiUrlWithoutTrailingSlash;
 export const DELIVERY_FEE = 250;
 
 export const ALLOWED_STAFF_EMAILS = [
