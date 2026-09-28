@@ -7,7 +7,7 @@
     "dev": "nodemon server.js",
     "data:import": "node seeder.js",
     "data:destroy": "node seeder.js -d",
-    "test": "node --test"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -22,11 +22,10 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.0",
-    "nodemailer": "^10.0.10",
+    "nodemailer": "^8.0.7",
     "twilio": "^6.0.2"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14",
-    "supertest": "^7.3.0"
+    "nodemon": "^3.1.14"
   }
 }

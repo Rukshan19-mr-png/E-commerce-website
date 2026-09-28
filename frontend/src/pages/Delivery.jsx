@@ -5,14 +5,15 @@ import { API_BASE, CURRENCY } from '../utils/constants';
 const Delivery = () => {
   const [orders, setOrders] = useState([]);
   const { auth } = useAuth();
-  const [loadedToken, setLoadedToken] = useState(null);
-  const loading = Boolean(auth?.token) && loadedToken !== auth.token;
+  const [loading, setLoading] = useState(() => !!auth?.token);
   const [error, setError] = useState(null);
 
+  // Reset loading state when auth token changes (idiomatic useEffect approach)
   useEffect(() => {
-    if (!auth?.token) return undefined;
+    setLoading(!!auth?.token);
+  }, [auth?.token]);
 
-    let cancelled = false;
+  useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/orders`, {
@@ -20,19 +21,17 @@ const Delivery = () => {
         });
         if (!res.ok) throw new Error('Failed to load orders');
         const data = await res.json();
-        if (!cancelled) setOrders(data.orders || []);
+        setOrders(data.orders || []);
       } catch (err) {
-        if (!cancelled) setError(err.message);
+        setError(err.message);
       } finally {
-        if (!cancelled) setLoadedToken(auth.token);
+        setLoading(false);
       }
     };
 
-    fetchOrders();
-
-    return () => {
-      cancelled = true;
-    };
+    if (auth?.token) {
+      fetchOrders();
+    }
   }, [auth]);
 
   const updateStatus = async (orderId, newStatus) => {

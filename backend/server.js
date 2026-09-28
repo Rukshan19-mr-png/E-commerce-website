@@ -1,10 +1,9 @@
 const dns = require('dns');
-if (process.platform === 'win32' && !process.env.VERCEL) {
-  try {
-    dns.setServers(['8.8.8.8', '8.8.4.4']);
-  } catch (e) {
-    console.warn('Unable to set custom DNS servers:', e.message);
-  }
+// Set DNS servers to Google's public DNS to bypass local Windows DNS resolution issues for MongoDB Atlas SRV records
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (e) {
+  console.warn('Unable to set custom DNS servers:', e.message);
 }
 
 const express = require('express');
@@ -52,7 +51,10 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (e.g. mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.vercel.app')
+    ) {
       return callback(null, true);
     }
     callback(new Error(`CORS: Origin ${origin} not allowed`));
@@ -65,7 +67,7 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Ensure database is connected for serverless invocations
 app.use(async (req, res, next) => {
-  if (process.env.MONGO_URI && mongoose.connection.readyState !== 1) {
+  if (process.env.MONGO_URI && mongoose.connection.readyState === 0) {
     try {
       await connectDB();
     } catch (e) {
@@ -197,15 +199,6 @@ const sanitizeUser = (user) => {
   return safeUser;
 };
 
-const normalizeEmail = (email) => (typeof email === 'string' ? email.trim().toLowerCase() : '');
-const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const findUserByEmail = (email) => {
-  const normalizedEmail = normalizeEmail(email);
-  return User.findOne({
-    email: { $regex: `^${escapeRegex(normalizedEmail)}$`, $options: 'i' },
-  });
-};
-
 const ALLOWED_STAFF_EMAILS = [
   'abeywardenamr@gmail.com',
   'maleesharukshan19@gmail.com'
@@ -216,15 +209,14 @@ const DELIVERY_FEE = 250;
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { name, email, password, role, phoneNumber } = req.body;
-    const normalizedEmail = normalizeEmail(email);
 
-    if (!name || !normalizedEmail || !password || !role || !phoneNumber) {
+    if (!name || !email || !password || !role || !phoneNumber) {
       return res.status(400).json({ message: 'Name, email, password, role, and phone number are required.' });
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(normalizedEmail)) {
+    if (!emailRegex.test(email)) {
       return res.status(400).json({ message: 'Please enter a valid email address.' });
     }
 
@@ -236,28 +228,28 @@ app.post('/api/auth/signup', async (req, res) => {
 
     // Role check for staff (seller, manager, delivery)
     if (['seller', 'manager', 'delivery'].includes(role)) {
-      if (!ALLOWED_STAFF_EMAILS.includes(normalizedEmail)) {
+      if (!ALLOWED_STAFF_EMAILS.includes(email.toLowerCase())) {
         return res.status(403).json({ message: 'Unauthorized email. Only specific emails can register as staff.' });
       }
     }
 
     if (isDBConnected()) {
-      const existingUser = await findUserByEmail(normalizedEmail);
+      const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(409).json({ message: 'Email already registered.' });
       }
 
-      const user = await User.create({ name, email: normalizedEmail, password, role, phoneNumber });
+      const user = await User.create({ name, email, password, role, phoneNumber });
       res.status(201).json({ user: sanitizeUser(user.toObject()), token: createToken(user) });
     } else {
       console.log('Mocking signup (no DB connection)');
-      const existingUser = staticUsers.find(u => normalizeEmail(u.email) === normalizedEmail);
+      const existingUser = staticUsers.find(u => u.email === email);
       if (existingUser) {
         return res.status(409).json({ message: 'Email already registered in static data.' });
       }
       
       const hashedPassword = bcrypt.hashSync(password, 10);
-      const mockUser = { name, email: normalizedEmail, role, phoneNumber, password: hashedPassword, id: 'mock-' + Date.now() };
+      const mockUser = { name, email, role, phoneNumber, password: hashedPassword, id: 'mock-' + Date.now() };
       staticUsers.push(mockUser);
       
       res.status(201).json({ user: sanitizeUser(mockUser), token: createToken(mockUser) });
@@ -269,49 +261,28 @@ app.post('/api/auth/signup', async (req, res) => {
 
 // Forgot Password - Send Reset Code
 app.post('/api/auth/forgot-password', async (req, res) => {
-  const email = normalizeEmail(req.body.email);
+  const { email } = req.body;
   try {
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     const resetCodeExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
-    let registeredEmail;
 
     if (isDBConnected()) {
-      const user = await findUserByEmail(email);
+      const user = await User.findOne({ email });
       if (!user) return res.status(404).json({ message: 'No account found with this email.' });
 
-      registeredEmail = user.email;
       user.resetCode = resetCode;
       user.resetCodeExpire = resetCodeExpire;
       await user.save();
     } else {
       console.log('Mocking forgot-password (no DB connection)');
-      const user = staticUsers.find(u => normalizeEmail(u.email) === email);
-      if (!user) return res.status(404).json({ message: 'No account found with this email (static).' });
+      const userExists = staticUsers.find(u => u.email === email);
+      if (!userExists) return res.status(404).json({ message: 'No account found with this email (static).' });
       
-      registeredEmail = user.email;
-      inMemoryResetCodes[normalizeEmail(registeredEmail)] = { code: resetCode, expire: resetCodeExpire };
+      inMemoryResetCodes[email] = { code: resetCode, expire: resetCodeExpire };
     }
 
-    // Send the code only through a configured mail provider in production.
-    const emailResult = await sendResetCode(registeredEmail, resetCode);
-    if (!emailResult?.success) {
-      if (isDBConnected()) {
-        const user = await findUserByEmail(registeredEmail);
-        if (user) {
-          user.resetCode = undefined;
-          user.resetCodeExpire = undefined;
-          await user.save();
-        }
-      } else {
-        delete inMemoryResetCodes[normalizeEmail(registeredEmail)];
-      }
-
-      console.error('Password reset email delivery failed:', emailResult?.error || 'Unknown email delivery error.');
-      return res.status(503).json({
-        message: 'We could not send the password reset email. Please try again later or contact support.',
-      });
-    }
-
+    // Send Code via Email (Both for DB and Mock)
+    const emailResult = await sendResetCode(email, resetCode);
     res.json({ 
       message: 'Verification code sent to your email.',
       previewUrl: emailResult?.previewUrl
@@ -324,15 +295,15 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 
 // Verify Reset Code
 app.post('/api/auth/verify-code', async (req, res) => {
-  const email = normalizeEmail(req.body.email);
-  const { code } = req.body;
+  const { email, code } = req.body;
   try {
     if (isDBConnected()) {
-      const user = await findUserByEmail(email);
-      const matchingUser = user && user.resetCode === code && user.resetCodeExpire > Date.now()
-        ? user
-        : null;
-      if (!matchingUser) return res.status(400).json({ message: 'Invalid or expired verification code.' });
+      const user = await User.findOne({ 
+        email,
+        resetCode: code,
+        resetCodeExpire: { $gt: Date.now() }
+      });
+      if (!user) return res.status(400).json({ message: 'Invalid or expired verification code.' });
     } else {
       const stored = inMemoryResetCodes[email];
       if (!stored || stored.code !== code || stored.expire < Date.now()) {
@@ -347,13 +318,16 @@ app.post('/api/auth/verify-code', async (req, res) => {
 
 // Reset Password - Finalize with Code
 app.post('/api/auth/reset-password', async (req, res) => {
-  const email = normalizeEmail(req.body.email);
-  const { code, newPassword } = req.body;
+  const { email, code, newPassword } = req.body;
   try {
     if (isDBConnected()) {
-      const user = await findUserByEmail(email);
+      const user = await User.findOne({ 
+        email,
+        resetCode: code,
+        resetCodeExpire: { $gt: Date.now() }
+      });
 
-      if (!user || user.resetCode !== code || user.resetCodeExpire <= Date.now()) {
+      if (!user) {
         return res.status(400).json({ message: 'Invalid or expired verification code.' });
       }
 
@@ -383,14 +357,13 @@ app.post('/api/auth/reset-password', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const normalizedEmail = normalizeEmail(email);
 
-    if (!normalizedEmail || !password) {
+    if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required.' });
     }
 
     if (isDBConnected()) {
-      const user = await findUserByEmail(normalizedEmail);
+      const user = await User.findOne({ email });
       if (!user) {
         return res.status(401).json({ message: 'No account found with this email. Please sign up first.' });
       }
@@ -403,7 +376,7 @@ app.post('/api/auth/login', async (req, res) => {
       res.json({ user: sanitizeUser(user.toObject()), token: createToken(user) });
     } else {
       console.log('Mocking login (no DB connection)');
-      const user = staticUsers.find(u => normalizeEmail(u.email) === normalizedEmail);
+      const user = staticUsers.find(u => u.email === email);
       if (user && bcrypt.compareSync(password, user.password)) {
         res.json({ user: sanitizeUser(user), token: createToken(user) });
       } else {
@@ -444,61 +417,45 @@ app.post('/api/orders', async (req, res) => {
   try {
     const { userEmail, userName, items, total, subtotal, tax, address, phone, paymentMethod, orderType } = req.body;
 
-    if (
-      !userEmail ||
-      !Array.isArray(items) ||
-      items.length === 0 ||
-      !Number.isFinite(total) ||
-      total < 0 ||
-      !phone ||
-      items.some(item => !item || !(item.id || item._id) || !Number.isInteger(item.quantity) || item.quantity < 1)
-    ) {
-      return res.status(400).json({ message: 'Valid email, items, phone, and total are required.' });
+    if (!userEmail || !items || total === undefined || !phone) {
+      return res.status(400).json({ message: 'Email, items, phone, and total are required.' });
     }
 
     const isPickup = orderType === 'Store Pickup';
     const finalShipping = isPickup ? 0 : DELIVERY_FEE;
     const finalTotal = total + finalShipping;
-    const stockRequests = new Map();
-    for (const item of items) {
-      const productId = String(item.id || item._id);
-      const request = stockRequests.get(productId) || { quantity: 0, items: [] };
-      request.quantity += item.quantity;
-      request.items.push(item);
-      stockRequests.set(productId, request);
-    }
 
     if (isDBConnected()) {
       // 1. Verify Stock
-      for (const [productId, request] of stockRequests) {
+      for (const item of items) {
         // Support legacy numeric/string `id` values from static seed data by
         // attempting to match either `_id` (ObjectId) or the `id` field on the document.
         // Build a safe query: only query by _id if the value is a valid ObjectId
         const orQuery = [];
-        if (mongoose.Types.ObjectId.isValid(productId)) orQuery.push({ _id: productId });
-        orQuery.push({ id: productId });
+        if (mongoose.Types.ObjectId.isValid(item.id)) orQuery.push({ _id: item.id });
+        orQuery.push({ id: item.id });
         const product = await Product.findOne(orQuery.length > 1 ? { $or: orQuery } : orQuery[0]);
         if (!product) {
-          return res.status(404).json({ message: `Product ${request.items[0].name} not found.` });
+          return res.status(404).json({ message: `Product ${item.name} not found.` });
         }
-        if (product.countInStock < request.quantity) {
+        if (product.countInStock < item.quantity) {
           return res.status(400).json({ message: `Insufficient stock for ${product.name}. Only ${product.countInStock} left.` });
         }
       }
 
       // 2. Deduct Stock
-      for (const [productId, request] of stockRequests) {
+      for (const item of items) {
         // Resolve product by _id or legacy `id` field and update stock.
         const orQuery = [];
-        if (mongoose.Types.ObjectId.isValid(productId)) orQuery.push({ _id: productId });
-        orQuery.push({ id: productId });
+        if (mongoose.Types.ObjectId.isValid(item.id)) orQuery.push({ _id: item.id });
+        orQuery.push({ id: item.id });
         const product = await Product.findOne(orQuery.length > 1 ? { $or: orQuery } : orQuery[0]);
         // If somehow product is missing here, skip (it was validated above)
         if (!product) continue;
-        product.countInStock -= request.quantity;
+        product.countInStock -= item.quantity;
         await product.save();
         // Normalize item id to the real ObjectId for the stored order
-        for (const item of request.items) item.id = product._id.toString();
+        item.id = product._id.toString();
       }
 
       const newOrder = await Order.create({
@@ -521,21 +478,6 @@ app.post('/api/orders', async (req, res) => {
       res.status(201).json({ order: { ...newOrder.toObject(), id: newOrder._id.toString() } });
     } else {
       console.log('Mocking order creation (no DB connection)');
-      for (const [productId, request] of stockRequests) {
-        const product = staticProducts.find(p => String(p.id) === productId);
-        if (!product) {
-          return res.status(404).json({ message: `Product ${request.items[0].name} not found.` });
-        }
-        if (product.countInStock < request.quantity) {
-          return res.status(400).json({ message: `Insufficient stock for ${product.name}. Only ${product.countInStock} left.` });
-        }
-      }
-
-      for (const [productId, request] of stockRequests) {
-        const product = staticProducts.find(p => String(p.id) === productId);
-        if (product) product.countInStock -= request.quantity;
-      }
-
       const mockOrder = { 
         id: 'order-' + Date.now(), 
         userEmail, 
@@ -544,7 +486,6 @@ app.post('/api/orders', async (req, res) => {
         total: finalTotal, 
         shipping: finalShipping,
         tax: tax || 0,
-        address,
         phone,
         paymentMethod: paymentMethod || 'Cash on Delivery',
         orderType: orderType || 'Home Delivery',
@@ -788,8 +729,8 @@ app.put('/api/products/:id/stock', async (req, res) => {
     }
 
     const { countInStock } = req.body;
-    if (!Number.isInteger(countInStock) || countInStock < 0) {
-      return res.status(400).json({ message: 'countInStock must be a non-negative integer.' });
+    if (countInStock === undefined) {
+      return res.status(400).json({ message: 'countInStock is required.' });
     }
 
     if (isDBConnected()) {
@@ -813,3 +754,4 @@ app.put('/api/products/:id/stock', async (req, res) => {
 // NOTE: server is started in connectDB() finally handler above.
 
 module.exports = app;
+

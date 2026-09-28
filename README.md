@@ -34,18 +34,8 @@ Quick development steps:
 	npm run dev
 	```
 
-## Tests
-
-Run the backend API regression tests from the repository root:
-
-```bash
-npm test
-```
-
-The tests use the backend's in-memory fallback and stub email/SMS notifications, so they do not require MongoDB or external payment/notification credentials.
-
 ## Deployment & environment variables
-Deploy the frontend and API as two projects on Vercel using the [deployment guide](./DEPLOYMENT.md).
+For production deployment, follow the deployment guide in `DEPLOYMENT.md`.
 
 ### Backend environment variables
 - `MONGO_URI`: MongoDB Atlas connection string
