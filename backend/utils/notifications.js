@@ -8,11 +8,22 @@ const getOrderRef = (order) => {
 };
 
 // Only create transporter if SMTP credentials are configured
-const isEmailConfigured = () => {
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
-  return user && pass && !user.includes('your-email') && !pass.includes('your-app-password');
+const getMissingEmailCredentials = () => {
+  const user = process.env.EMAIL_USER?.trim();
+  const pass = process.env.EMAIL_PASS?.trim();
+  const missing = [];
+
+  if (!user || user.includes('your-email') || user.startsWith('<')) {
+    missing.push('EMAIL_USER');
+  }
+  if (!pass || pass.includes('app-password') || pass.startsWith('<')) {
+    missing.push('EMAIL_PASS');
+  }
+
+  return missing;
 };
+
+const isEmailConfigured = () => getMissingEmailCredentials().length === 0;
 
 let testAccountCache = null;
 
@@ -148,10 +159,16 @@ const notifyOrderDelivered = async (order) => {
  * Send Password Reset Code
  */
 const sendResetCode = async (email, code) => {
+  const missingEmailCredentials = getMissingEmailCredentials();
+  if (process.env.VERCEL && missingEmailCredentials.length > 0) {
+    return {
+      success: false,
+      error: `Password reset email is not configured. Set ${missingEmailCredentials.join(' and ')}.`,
+    };
+  }
+
   const subject = 'Password Reset Verification Code - Plantopia';
   const message = `Your password reset verification code is: ${code}. This code will expire in 10 minutes.`;
-
-  console.log(`[RESET CODE] To: ${email} | Code: ${code}`);
 
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #1b4332; max-width: 500px; margin: auto; border: 1px solid #d8f3dc; border-radius: 12px;">
