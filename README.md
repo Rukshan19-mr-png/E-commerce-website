@@ -42,7 +42,10 @@ For production deployment, follow the deployment guide in `DEPLOYMENT.md`.
 - `JWT_SECRET`: strong secret for JWT tokens
 - `ALLOWED_ORIGINS`: frontend domains allowed by CORS
 - `BACKEND_URL`: hosted backend URL used in CSP
-- `PAYPAL_CLIENT_ID`: PayPal client ID used by backend config
+- `PAYPAL_CLIENT_ID`: PayPal REST app client ID (backend only)
+- `PAYPAL_CLIENT_SECRET`: PayPal REST app secret (backend only)
+- `PAYPAL_MODE`: `sandbox` while testing, `live` for live credentials
+- `LKR_TO_USD_RATE`: LKR-to-USD rate used for PayPal checkout
 - `EMAIL_USER`: Gmail address for Nodemailer
 - `EMAIL_PASS`: Gmail App Password
 - `TWILIO_SID`: Twilio Account SID
@@ -51,7 +54,9 @@ For production deployment, follow the deployment guide in `DEPLOYMENT.md`.
 
 ### Frontend environment variables
 - `VITE_API_URL`: your backend URL for production
-- `VITE_PAYPAL_CLIENT_ID`: your live PayPal client ID
+- PayPal's public client ID is fetched from the backend; do not set a `VITE_PAYPAL_CLIENT_ID`.
+
+For the Vercel deployment plan, including separate project settings for `frontend/` and `backend/`, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Notification Setup
 To enable notifications, ensure the following keys are set in your backend `.env`:

@@ -1,17 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
-import { API_BASE, DELIVERY_FEE, CURRENCY, LKR_TO_USD_RATE } from '../utils/constants';
+import { API_BASE, DELIVERY_FEE, CURRENCY } from '../utils/constants';
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { cart, cartTotal, clearCart } = useCart();
-  const { auth } = useAuth();
-
   const [form, setForm] = useState({
-    fullName: auth?.name || '',
-    email: auth?.email || '',
+    fullName: '',
+    email: '',
     address1: '',
     address2: '',
     city: '',
@@ -21,7 +18,7 @@ const Checkout = () => {
     paymentMethod: 'Cash on Delivery',
     orderType: 'Home Delivery',
     branch: '',
-    phone: auth?.phoneNumber || '',
+    phone: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -53,7 +50,9 @@ const Checkout = () => {
   };
 
   const loadScript = (src) => new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) return resolve();
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing && window.paypal) return resolve();
+    if (existing) existing.remove();
     const s = document.createElement('script');
     s.src = src;
     s.async = true;
@@ -63,20 +62,23 @@ const Checkout = () => {
   });
 
   const handlePayPalPayment = async (order) => {
-    const orderId = order.id || order._id;
-    const amountInUSD = (grandTotal * LKR_TO_USD_RATE).toFixed(2);
-    const amount = amountInUSD;
-
-    // Get PayPal client id from backend
-    let clientId = 'sb';
+    // Get PayPal client id from backend; there is no fake fallback in production.
+    let clientId = '';
     try {
       const cfg = await fetch(`${API_BASE}/api/config/paypal`);
       if (cfg.ok) {
         const cfgData = await cfg.json();
-        clientId = cfgData.clientId || clientId;
+        clientId = cfgData.clientId || '';
       }
     } catch {
-      console.warn('Failed to fetch PayPal config, falling back to sandbox client id');
+      setErrors({ submit: 'Could not connect to the payment service. Please try again.' });
+      setSubmitting(false);
+      return;
+    }
+    if (!clientId) {
+      setErrors({ submit: 'PayPal is not configured yet. Please choose another payment method or contact support.' });
+      setSubmitting(false);
+      return;
     }
 
     const sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
@@ -88,17 +90,31 @@ const Checkout = () => {
       return;
     }
 
-    // Create PayPal order on server
+    // The server calculates the amount, verifies current prices and stock, and
+    // creates the pending order before requesting the PayPal checkout token.
     let paypalOrderId = null;
+    let backendOrderId = null;
     try {
       const createRes = await fetch(`${API_BASE}/api/payments/paypal/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId, amount }),
+        body: JSON.stringify({
+          userEmail: form.email,
+          userName: form.fullName,
+          items: cart,
+          total: cartTotal,
+          tax: 0,
+          address: form.orderType === 'Store Pickup'
+            ? `Store Pickup at ${form.branch} Branch`
+            : `${form.address1}${form.address2 ? ', ' + form.address2 : ''}, ${form.city}, ${form.state} ${form.postalCode}, ${form.country}`,
+          phone: form.phone,
+          orderType: form.orderType,
+        }),
       });
       const createData = await createRes.json();
       if (!createRes.ok) throw new Error(createData.message || 'Failed to create PayPal order');
       paypalOrderId = createData.id;
+      backendOrderId = createData.orderId;
     } catch (err) {
       setErrors({ submit: `Payment setup failed: ${err.message}` });
       setSubmitting(false);
@@ -114,31 +130,15 @@ const Checkout = () => {
        
       window.paypal.Buttons({
         createOrder: () => paypalOrderId,
-        // eslint-disable-next-line no-unused-vars
-        onApprove: async (_data, actions) => {
+        onApprove: async () => {
           try {
             const capRes = await fetch(`${API_BASE}/api/payments/paypal/capture-order`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paypalOrderId, orderId }),
+              body: JSON.stringify({ paypalOrderId, orderId: backendOrderId }),
             });
             const capData = await capRes.json();
             if (!capRes.ok) throw new Error(capData.message || 'Failed to capture PayPal order');
-
-            // Mark order paid in backend
-            const res = await fetch(`${API_BASE}/api/orders/${orderId}/pay`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${auth?.token}`
-              },
-              body: JSON.stringify({
-                id: capData.id || ('paypal-' + Date.now()),
-                status: 'completed'
-              })
-            });
-
-            if (!res.ok) throw new Error('Failed to update order payment');
 
             clearCart();
             navigate('/success', {
@@ -191,7 +191,7 @@ const Checkout = () => {
           ? `Store Pickup at ${form.branch} Branch`
           : `${form.address1}${form.address2 ? ', ' + form.address2 : ''}, ${form.city}, ${form.state} ${form.postalCode}, ${form.country}`,
         phone: form.phone,
-        paymentMethod: form.paymentMethod === 'Online Payment' ? 'PayPal Online' : form.paymentMethod,
+        paymentMethod: form.paymentMethod === 'Online Payment' ? 'PayPal' : form.paymentMethod,
         orderType: form.orderType,
       };
 
@@ -213,12 +213,14 @@ const Checkout = () => {
         }
       }
 
+      if (form.paymentMethod === 'Online Payment') {
+        await handlePayPalPayment(orderData);
+        return;
+      }
+
       const response = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth?.token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData),
       });
 
@@ -237,23 +239,16 @@ const Checkout = () => {
         return;
       }
 
-      const data = await response.json();
-      const order = data.order;
-
-      if (form.paymentMethod !== 'Online Payment') {
-        clearCart();
-        navigate('/success', {
-          state: {
-            fullName: form.fullName,
-            email: form.email,
-            total: grandTotal,
-            paymentMethod: form.paymentMethod,
-          },
-        });
-      } else {
-        // Online Payment with PayPal
-        await handlePayPalPayment(order);
-      }
+      await response.json();
+      clearCart();
+      navigate('/success', {
+        state: {
+          fullName: form.fullName,
+          email: form.email,
+          total: grandTotal,
+          paymentMethod: form.paymentMethod,
+        },
+      });
     } catch {
       setErrors({ submit: 'Failed to place order. Please try again.' });
       setSubmitting(false);

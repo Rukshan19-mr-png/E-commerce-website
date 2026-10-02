@@ -23,6 +23,7 @@ const orderSchema = new mongoose.Schema({
       update_time: { type: String },
       email_address: { type: String },
     },
+    paypalOrderId: { type: String },
   },
   {
     timestamps: true,

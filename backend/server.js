@@ -425,6 +425,10 @@ app.post('/api/orders', async (req, res) => {
     const finalShipping = isPickup ? 0 : DELIVERY_FEE;
     const finalTotal = total + finalShipping;
 
+    if (paymentMethod === 'PayPal' || paymentMethod === 'PayPal Online') {
+      return res.status(400).json({ message: 'Use the PayPal checkout endpoint to create online orders.' });
+    }
+
     if (isDBConnected()) {
       // 1. Verify Stock
       for (const item of items) {
@@ -504,52 +508,49 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-// Update order to paid
-app.put('/api/orders/:id/pay', async (req, res) => {
-  try {
-    if (isDBConnected()) {
-      const order = await Order.findById(req.params.id);
-      if (order) {
-        order.isPaid = true;
-        order.paidAt = Date.now();
-        order.status = 'paid';
-        order.paymentResult = {
-          id: req.body.id || 'payhere-tr-' + Date.now(),
-          status: req.body.status || 'completed',
-          update_time: req.body.update_time || new Date().toISOString(),
-          email_address: req.body.payer?.email_address || '',
-        };
-        const updatedOrder = await order.save();
-        res.json(updatedOrder);
-      } else {
-        res.status(404).json({ message: 'Order not found' });
-      }
-    } else {
-      const order = inMemoryOrders.find(o => o.id === req.params.id);
-      if (order) {
-        order.isPaid = true;
-        order.paidAt = new Date();
-        order.status = 'paid';
-        res.json(order);
-      } else {
-        res.status(404).json({ message: 'Order not found' });
-      }
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
-
 // PayHere webhook removed — PayPal integration in use instead.
 
 // PayPal configuration endpoint (client id exposed to frontend)
 app.get('/api/config/paypal', (req, res) => {
-  const clientId = process.env.PAYPAL_CLIENT_ID || 'sb';
+  const clientId = process.env.PAYPAL_CLIENT_ID || '';
   const mode = process.env.PAYPAL_MODE === 'live' ? 'live' : 'sandbox';
-  res.json({ clientId, sandbox: mode !== 'live' });
+  res.json({ clientId, sandbox: mode !== 'live', enabled: Boolean(clientId && process.env.PAYPAL_CLIENT_SECRET) });
 });
 
 const getPayPalBase = () => (process.env.PAYPAL_MODE === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com');
+const LKR_TO_USD_RATE = Number(process.env.LKR_TO_USD_RATE || 0.0033);
+
+const resolveProduct = async (id) => {
+  if (isDBConnected()) {
+    const queries = [];
+    if (mongoose.Types.ObjectId.isValid(id)) queries.push({ _id: id });
+    queries.push({ id });
+    return Product.findOne(queries.length > 1 ? { $or: queries } : queries[0]);
+  }
+  return staticProducts.find((product) => product.id === String(id));
+};
+
+const saveOrder = async (orderData) => {
+  if (isDBConnected()) return Order.create(orderData);
+  const order = { ...orderData, id: `order-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`, createdAt: new Date() };
+  inMemoryOrders.push(order);
+  return order;
+};
+
+const findOrder = async (id) => {
+  if (isDBConnected()) return mongoose.Types.ObjectId.isValid(id) ? Order.findById(id) : null;
+  return inMemoryOrders.find((order) => order.id === id);
+};
+
+const persistOrder = async (order) => (isDBConnected() ? order.save() : order);
+
+const requirePayPalConfig = (res) => {
+  if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
+    res.status(503).json({ message: 'PayPal is not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET on the backend.' });
+    return false;
+  }
+  return true;
+};
 
 async function getPayPalAccessToken() {
   const clientId = process.env.PAYPAL_CLIENT_ID || '';
@@ -577,14 +578,87 @@ async function getPayPalAccessToken() {
 // Create PayPal order (server-side)
 app.post('/api/payments/paypal/create-order', async (req, res) => {
   try {
-    const { orderId, amount } = req.body;
-    if (!orderId || !amount) return res.status(400).json({ message: 'orderId and amount are required' });
+    const { userEmail, userName, items, total, tax, address, phone, orderType } = req.body;
+    if (!userEmail || !userName || !Array.isArray(items) || !items.length || !Number.isFinite(total) || total <= 0 || !phone || !address) {
+      return res.status(400).json({ message: 'Valid customer and order details are required.' });
+    }
+    if (!requirePayPalConfig(res)) return;
 
-    const token = await getPayPalAccessToken();
+    let subtotal = 0;
+    const verifiedItems = [];
+    for (const item of items) {
+      const quantity = Number(item.quantity);
+      if (!item.id || !Number.isInteger(quantity) || quantity < 1) return res.status(400).json({ message: 'Each item needs a valid product id and quantity.' });
+      const product = await resolveProduct(item.id);
+      if (!product) return res.status(404).json({ message: `Product ${item.name || item.id} not found.` });
+      if (product.countInStock < quantity) return res.status(400).json({ message: `Insufficient stock for ${product.name}. Only ${product.countInStock} left.` });
+      subtotal += product.price * quantity;
+      verifiedItems.push({ id: isDBConnected() ? product._id.toString() : product.id, name: product.name, price: product.price, quantity, image: product.image });
+    }
+    if (Math.round(total) !== Math.round(subtotal)) return res.status(400).json({ message: 'Cart total does not match current product prices.' });
+
+    const shipping = orderType === 'Store Pickup' ? 0 : DELIVERY_FEE;
+    const grandTotal = subtotal + shipping;
+    const amount = (grandTotal * LKR_TO_USD_RATE).toFixed(2);
+    if (Number(amount) <= 0) return res.status(400).json({ message: 'Order total must be greater than zero.' });
+
+    // Check all stock before deducting any.
+    for (const item of verifiedItems) {
+      const product = await resolveProduct(item.id);
+      if (!product || product.countInStock < item.quantity) return res.status(409).json({ message: `Stock changed for ${item.name}. Please review your cart.` });
+    }
+    const reservedProducts = [];
+    for (const item of verifiedItems) {
+      const product = await resolveProduct(item.id);
+      if (isDBConnected()) {
+        const updated = await Product.updateOne({ _id: product._id, countInStock: { $gte: item.quantity } }, { $inc: { countInStock: -item.quantity } });
+        if (updated.modifiedCount !== 1) {
+          for (const reservation of reservedProducts) await Product.updateOne({ _id: reservation.id }, { $inc: { countInStock: reservation.quantity } });
+          return res.status(409).json({ message: `Stock changed for ${item.name}. Please review your cart.` });
+        }
+        reservedProducts.push({ id: product._id, quantity: item.quantity });
+      } else {
+        product.countInStock -= item.quantity;
+      }
+    }
+
+    let order;
+    try {
+      order = await saveOrder({
+      userEmail, userName, items: verifiedItems, total: grandTotal, shipping,
+      tax: Number(tax) || 0, address, paymentMethod: 'PayPal', orderType: orderType || 'Home Delivery',
+      phone, status: 'pending', isPaid: false,
+      });
+    } catch (error) {
+      for (const reservation of reservedProducts) await Product.updateOne({ _id: reservation.id }, { $inc: { countInStock: reservation.quantity } });
+      if (!isDBConnected()) {
+        for (const item of verifiedItems) (await resolveProduct(item.id)).countInStock += item.quantity;
+      }
+      throw error;
+    }
+
+    let token;
+    try {
+      token = await getPayPalAccessToken();
+    } catch (error) {
+      if (isDBConnected()) {
+        for (const reservation of reservedProducts) await Product.updateOne({ _id: reservation.id }, { $inc: { countInStock: reservation.quantity } });
+        await Order.deleteOne({ _id: order._id });
+      } else {
+        for (const item of verifiedItems) (await resolveProduct(item.id)).countInStock += item.quantity;
+        inMemoryOrders.splice(inMemoryOrders.indexOf(order), 1);
+      }
+      throw error;
+    }
     const createUrl = `${getPayPalBase()}/v2/checkout/orders`;
     const body = {
       intent: 'CAPTURE',
-      purchase_units: [{ amount: { currency_code: 'USD', value: String(amount) } }],
+      purchase_units: [{
+        reference_id: order._id ? order._id.toString() : order.id,
+        custom_id: order._id ? order._id.toString() : order.id,
+        invoice_id: order._id ? order._id.toString() : order.id,
+        amount: { currency_code: 'USD', value: amount },
+      }],
       application_context: {
         brand_name: 'Plantopia',
         return_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/success`,
@@ -599,20 +673,47 @@ app.post('/api/payments/paypal/create-order', async (req, res) => {
     });
     if (!resp.ok) {
       const txt = await resp.text().catch(() => '');
+      if (isDBConnected()) {
+        for (const reservation of reservedProducts) await Product.updateOne({ _id: reservation.id }, { $inc: { countInStock: reservation.quantity } });
+        await Order.deleteOne({ _id: order._id });
+      } else {
+        for (const item of verifiedItems) (await resolveProduct(item.id)).countInStock += item.quantity;
+        inMemoryOrders.splice(inMemoryOrders.indexOf(order), 1);
+      }
       return res.status(500).json({ message: 'Failed to create PayPal order: ' + txt });
     }
     const data = await resp.json();
-    res.json({ id: data.id, links: data.links });
+    if (!data.id) throw new Error('PayPal did not return an order id');
+    order.paypalOrderId = data.id;
+    try {
+      await persistOrder(order);
+    } catch (error) {
+      if (isDBConnected()) {
+        for (const reservation of reservedProducts) await Product.updateOne({ _id: reservation.id }, { $inc: { countInStock: reservation.quantity } });
+        await Order.deleteOne({ _id: order._id });
+      } else {
+        for (const item of verifiedItems) (await resolveProduct(item.id)).countInStock += item.quantity;
+        inMemoryOrders.splice(inMemoryOrders.indexOf(order), 1);
+      }
+      throw error;
+    }
+    res.json({ id: data.id, orderId: order._id ? order._id.toString() : order.id, amount, currency: 'USD' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('PayPal create order failed:', error.message);
+    res.status(500).json({ message: 'Could not create PayPal checkout. Please try again.' });
   }
 });
 
 // Capture PayPal order (server-side)
 app.post('/api/payments/paypal/capture-order', async (req, res) => {
   try {
-    const { paypalOrderId } = req.body;
-    if (!paypalOrderId) return res.status(400).json({ message: 'paypalOrderId is required' });
+    const { paypalOrderId, orderId } = req.body;
+    if (!paypalOrderId || !orderId) return res.status(400).json({ message: 'paypalOrderId and orderId are required.' });
+    if (!requirePayPalConfig(res)) return;
+    const order = await findOrder(orderId);
+    if (!order) return res.status(404).json({ message: 'Order not found.' });
+    if (order.isPaid) return res.status(409).json({ message: 'This order has already been paid.' });
+    if (order.paymentMethod !== 'PayPal' || order.paypalOrderId !== paypalOrderId) return res.status(400).json({ message: 'PayPal order does not match this checkout.' });
 
     const token = await getPayPalAccessToken();
     const capUrl = `${getPayPalBase()}/v2/checkout/orders/${paypalOrderId}/capture`;
@@ -622,6 +723,22 @@ app.post('/api/payments/paypal/capture-order', async (req, res) => {
     });
     const data = await resp.json();
     if (!resp.ok) return res.status(500).json({ message: data.message || JSON.stringify(data) });
+    const capture = data.purchase_units?.[0]?.payments?.captures?.[0];
+    const linkedOrderId = data.purchase_units?.[0]?.custom_id;
+    const expectedAmount = (Number(order.total) * LKR_TO_USD_RATE).toFixed(2);
+    if (data.status !== 'COMPLETED' || capture?.status !== 'COMPLETED' || capture?.amount?.currency_code !== 'USD' || capture?.amount?.value !== expectedAmount || linkedOrderId !== String(orderId)) {
+      return res.status(400).json({ message: 'PayPal capture details did not match this order.' });
+    }
+    order.isPaid = true;
+    order.paidAt = new Date();
+    order.status = 'paid';
+    order.paymentResult = {
+      id: capture.id, status: capture.status,
+      update_time: capture.update_time || data.update_time || new Date().toISOString(),
+      email_address: data.payer?.email_address || '',
+    };
+    await persistOrder(order);
+    notifyOrderConfirmed(order).catch((err) => console.error('Notification Error:', err));
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
