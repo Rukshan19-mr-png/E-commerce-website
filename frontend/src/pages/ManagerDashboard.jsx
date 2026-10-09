@@ -111,6 +111,10 @@ const ManagerDashboard = () => {
                 </div>
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                   {new Date(order.createdAt).toLocaleDateString()} — {order.status}
+                  <div>
+                    Payment: {order.paymentMethod} · {order.isPaid ? 'Paid' : 'Pending'}
+                    {order.paymentResult?.id && ` · Transaction ${order.paymentResult.id}`}
+                  </div>
                 </div>
               </div>
             ))}

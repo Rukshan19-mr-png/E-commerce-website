@@ -152,6 +152,12 @@ const OrderHistory = () => {
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                     {order.paymentMethod}
                   </p>
+                  {order.paymentMethod === 'PayPal' && (
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      Payment: {order.isPaid ? 'Paid' : 'Pending'}
+                      {order.paymentResult?.id && ` · Transaction ${order.paymentResult.id}`}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

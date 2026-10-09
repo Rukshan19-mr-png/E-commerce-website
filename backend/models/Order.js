@@ -24,6 +24,8 @@ const orderSchema = new mongoose.Schema({
       email_address: { type: String },
     },
     paypalOrderId: { type: String },
+    inventoryReserved: { type: Boolean, default: false },
+    paymentExpiresAt: { type: Date },
   },
   {
     timestamps: true,
