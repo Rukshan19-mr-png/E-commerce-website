@@ -305,7 +305,8 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     });
     
   } catch (error) {
-    res.status(500).json({ message: 'Server Error: ' + error.message });
+    console.error('Forgot-password request failed:', error);
+    res.status(500).json({ message: 'Unable to send a password reset code right now. Please try again later.' });
   }
 });
 
