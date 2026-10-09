@@ -1,0 +1,1 @@
+Commit 9/11: Add developer note about not exposing merchant secrets in logs.

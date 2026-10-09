@@ -1,0 +1,1 @@
+Commit 1/11: Decode PayHere secret if base64-encoded and log detection.

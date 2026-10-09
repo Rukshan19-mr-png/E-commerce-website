@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="lg1" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="50%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#86efac"/>
+    </linearGradient>
+
+    <linearGradient id="lg2" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="60%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#fbcfe8"/>
+    </linearGradient>
+
+    <filter id="blurLarge" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="60" result="b" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.8 0" />
+    </filter>
+
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="18" result="shadow"/>
+      <feOffset in="shadow" dx="0" dy="18" result="off"/>
+      <feMerge>
+        <feMergeNode in="off"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <mask id="fadeMask">
+      <rect x="0" y="0" width="100%" height="100%" fill="white" />
+      <radialGradient id="fadeGrad" cx="50%" cy="40%" r="60%">
+        <stop offset="0%" stop-color="#000" stop-opacity="1" />
+        <stop offset="100%" stop-color="#000" stop-opacity="0" />
+      </radialGradient>
+      <rect x="0" y="0" width="100%" height="100%" fill="url(#fadeGrad)" />
+    </mask>
+  </defs>
+
+  <!-- background base gradient -->
+  <rect width="100%" height="100%" fill="url(#lg1)" />
+
+  <!-- colorful blurred blobs to create depth -->
+  <g filter="url(#blurLarge)" opacity="0.95">
+    <ellipse cx="360" cy="240" rx="520" ry="300" fill="#a7f3d0" />
+    <ellipse cx="1560" cy="260" rx="600" ry="340" fill="#ffd6a5" />
+    <ellipse cx="1200" cy="800" rx="720" ry="420" fill="#c7b2ff" />
+  </g>
+
+  <!-- 3D translucent spheres -->
+  <g filter="url(#softShadow)">
+    <g transform="translate(520,420)">
+      <circle r="180" fill="url(#lg2)" opacity="0.98" />
+      <circle r="180" fill="white" opacity="0.16" />
+    </g>
+    <g transform="translate(1360,340)">
+      <circle r="220" fill="url(#lg1)" opacity="0.98" />
+      <circle r="220" fill="white" opacity="0.14" />
+    </g>
+  </g>
+
+  <!-- plant photos clipped into soft cards for realism -->
+  <g mask="url(#fadeMask)">
+    <g transform="translate(260,420) scale(0.9)" filter="url(#softShadow)">
+      <rect x="-40" y="-160" width="420" height="640" rx="36" fill="rgba(255,255,255,0.02)" />
+      <image href="/images/plants/monstera.jpg" x="0" y="0" width="340" height="560" preserveAspectRatio="xMidYMid slice" clip-path=""/>
+    </g>
+
+    <g transform="translate(1120,520) scale(0.95)" filter="url(#softShadow)">
+      <rect x="-40" y="-160" width="480" height="720" rx="44" fill="rgba(255,255,255,0.02)" />
+      <image href="/images/plants/bird-of-paradise.jpg" x="0" y="0" width="400" height="640" preserveAspectRatio="xMidYMid slice"/>
+    </g>
+
+    <g transform="translate(1500,760) scale(0.75)" filter="url(#softShadow)">
+      <rect x="-20" y="-100" width="260" height="380" rx="28" fill="rgba(255,255,255,0.02)" />
+      <image href="/images/plants/zz-plant.jpg" x="0" y="0" width="200" height="340" preserveAspectRatio="xMidYMid slice"/>
+    </g>
+  </g>
+
+  <!-- gentle vignette for focus -->
+  <rect width="100%" height="100%" fill="black" opacity="0.06" />
+
+  <!-- subtle highlights -->
+  <g fill="#fff" opacity="0.5">
+    <circle cx="480" cy="360" r="2" />
+    <circle cx="520" cy="320" r="1.6" />
+    <circle cx="1440" cy="300" r="2.6" />
+  </g>
+
+</svg>

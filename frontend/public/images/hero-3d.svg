@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="g1" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="50%" stop-color="#2d6a4f"/>
+      <stop offset="100%" stop-color="#7dd3a6"/>
+    </linearGradient>
+
+    <linearGradient id="g2" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff6b6b"/>
+      <stop offset="60%" stop-color="#ff9f1c"/>
+      <stop offset="100%" stop-color="#ffd27f"/>
+    </linearGradient>
+
+    <radialGradient id="sphere" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.92"/>
+      <stop offset="35%" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.12"/>
+    </radialGradient>
+
+    <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="30" result="blur"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.7 0"/>
+    </filter>
+
+    <filter id="dropshadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="18" result="shadow"/>
+      <feOffset in="shadow" dx="0" dy="20" result="off"/>
+      <feMerge>
+        <feMergeNode in="off"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- soft colorful background gradient -->
+  <rect width="100%" height="100%" fill="url(#g1)" />
+
+  <!-- large blurred blobs for depth -->
+  <g filter="url(#softBlur)">
+    <ellipse cx="320" cy="260" rx="420" ry="260" fill="#8ee3b6" opacity="0.95" />
+    <ellipse cx="1700" cy="220" rx="520" ry="320" fill="#ffd27f" opacity="0.95" />
+    <ellipse cx="1280" cy="760" rx="680" ry="420" fill="#a78bfa" opacity="0.9" />
+  </g>
+
+  <!-- 3D spheres with highlights -->
+  <g filter="url(#dropshadow)">
+    <g transform="translate(480 420)">
+      <circle r="160" fill="url(#g2)" />
+      <circle r="160" fill="url(#sphere)" opacity="0.28" />
+    </g>
+
+    <g transform="translate(1320 320)">
+      <circle r="200" fill="url(#g1)" />
+      <circle r="200" fill="url(#sphere)" opacity="0.24" />
+    </g>
+
+    <g transform="translate(1520 780)">
+      <circle r="120" fill="#60a5fa" />
+      <circle r="120" fill="url(#sphere)" opacity="0.22" />
+    </g>
+  </g>
+
+  <!-- subtle geometric layer -->
+  <g opacity="0.06" fill="#ffffff">
+    <rect x="220" y="780" width="220" height="120" transform="rotate(-18 330 840)"/>
+    <rect x="900" y="60" width="180" height="90" transform="rotate(12 990 105)"/>
+    <rect x="1400" y="540" width="260" height="140" transform="rotate(-10 1530 610)"/>
+  </g>
+
+  <!-- soft vignette / center focus -->
+  <rect width="100%" height="100%" fill="black" opacity="0.04" />
+
+  <!-- optional small highlights (sparkles) -->
+  <g fill="#fff" opacity="0.6">
+    <circle cx="420" cy="320" r="2" />
+    <circle cx="460" cy="280" r="1.4" />
+    <circle cx="1400" cy="260" r="2.4" />
+    <circle cx="1500" cy="740" r="1.6" />
+  </g>
+
+</svg>
