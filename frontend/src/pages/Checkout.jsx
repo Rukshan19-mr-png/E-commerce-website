@@ -37,7 +37,7 @@ const fetchPayPalConfig = async () => {
 const Checkout = () => {
   const navigate = useNavigate();
   const { cart, cartTotal, clearCart } = useCart();
-  const { auth } = useAuth();
+  const { auth, logout } = useAuth();
   const [form, setForm] = useState({
     fullName: auth?.name || '',
     email: auth?.email || '',
@@ -183,6 +183,18 @@ const Checkout = () => {
           orderType: form.orderType,
         }),
       });
+      if (createRes.status === 401) {
+        logout();
+        navigate('/login', {
+          replace: true,
+          state: {
+            from: '/checkout',
+            email: form.email,
+            sessionExpired: true,
+          },
+        });
+        return;
+      }
       const createData = await createRes.json();
       if (!createRes.ok) throw new Error(createData.message || 'Failed to create PayPal order');
       paypalOrderId = createData.id;

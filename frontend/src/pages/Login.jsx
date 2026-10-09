@@ -13,6 +13,7 @@ const Login = () => {
 
   // Check if user just signed up (redirected from Signup page)
   const justSignedUp = location.state?.signupSuccess;
+  const sessionExpired = location.state?.sessionExpired;
   const prefilledEmail = location.state?.email || '';
 
   // Pre-fill email if coming from signup
@@ -35,9 +36,18 @@ const Login = () => {
         throw new Error(data.message || 'Login failed. Check your email and password.');
       }
 
-      // ✅ Save session to localStorage via AuthContext — user stays logged in forever
+      // Save the refreshed session to localStorage via AuthContext.
       login(data);
-      navigate('/dashboard');
+      const redirectTo = location.state?.from;
+      const redirectPath = typeof redirectTo === 'string'
+        ? redirectTo
+        : redirectTo?.pathname
+          ? `${redirectTo.pathname}${redirectTo.search || ''}`
+          : '';
+      const destination = redirectPath.startsWith('/') && !redirectPath.startsWith('//')
+        ? redirectPath
+        : '/dashboard';
+      navigate(destination, { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,6 +83,11 @@ const Login = () => {
         )}
 
         <form className="auth-form" onSubmit={handleSubmit}>
+          {sessionExpired && (
+            <div className="error-text" style={{ background: 'rgba(220,53,69,0.1)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(220,53,69,0.3)', marginBottom: '1rem' }}>
+              Your session expired. Sign in again to continue checkout; your cart is saved.
+            </div>
+          )}
           <div className="form-field">
             <label>Email Address</label>
             <input
