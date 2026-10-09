@@ -37,7 +37,7 @@ Do not commit `.env` files or put `PAYPAL_CLIENT_SECRET`, `MONGO_URI`, `JWT_SECR
 
 5. Deploy and copy the resulting backend URL (for example `https://plantopia-api-....vercel.app`). Confirm `GET https://<backend-host>/api` and `GET https://<backend-host>/api/config/paypal` return JSON directly without redirecting to Vercel login; the PayPal config may expose only the public client ID, never the secret. If requests redirect to `/login` or `/sso-api`, disable Vercel Deployment Protection for the backend production deployment or use an API domain that is publicly reachable. Never put a Vercel protection-bypass secret in frontend code.
 
-PayPal checkout is disabled on Vercel unless the backend can reach MongoDB; serverless in-memory orders cannot safely be used to record paid purchases. Checkout reserves verified stock while the buyer completes PayPal. The reservation is released when PayPal is cancelled, or when the pending checkout has expired for 30 minutes and the next checkout/configuration request performs cleanup.
+PayPal checkout is disabled on Vercel unless the backend can reach MongoDB; serverless in-memory orders cannot safely be used to record paid purchases. The backend waits for an in-progress MongoDB connection before reporting PayPal readiness, and the configuration endpoint reports when the payment database is unavailable. Checkout reserves verified stock while the buyer completes PayPal. The reservation is released when PayPal is cancelled, or when the pending checkout has expired for 30 minutes and the next checkout/configuration request performs cleanup.
 
 ## 3. Deploy the frontend project
 

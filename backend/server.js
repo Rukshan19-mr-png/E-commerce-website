@@ -67,11 +67,11 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Ensure database is connected for serverless invocations
 app.use(async (req, res, next) => {
-  if (process.env.MONGO_URI && mongoose.connection.readyState === 0) {
+  if (process.env.MONGO_URI && !isDBConnected()) {
     try {
       await connectDB();
-    } catch (e) {
-      // ConnectDB logs failure and continues with static fallback
+    } catch {
+      // Keep non-payment API routes available with static fallback data.
     }
   }
   next();
@@ -580,18 +580,23 @@ app.get('/api/config/paypal', async (req, res) => {
   const clientId = process.env.PAYPAL_CLIENT_ID || '';
   const mode = process.env.PAYPAL_MODE === 'live' ? 'live' : 'sandbox';
   const persistentStorageAvailable = !process.env.VERCEL || isDBConnected();
-  const enabled = Boolean(
-    clientId
-    && process.env.PAYPAL_CLIENT_SECRET
-    && Number.isFinite(getLkrToUsdRate())
-    && getLkrToUsdRate() > 0
-    && persistentStorageAvailable
-  );
+  const configurationIssues = [];
+  if (!clientId || !process.env.PAYPAL_CLIENT_SECRET) {
+    configurationIssues.push('PayPal credentials are incomplete.');
+  }
+  if (!Number.isFinite(getLkrToUsdRate()) || getLkrToUsdRate() <= 0) {
+    configurationIssues.push('The LKR-to-USD exchange rate is invalid.');
+  }
+  if (!persistentStorageAvailable) {
+    configurationIssues.push('The payment database is not connected. Please retry shortly.');
+  }
+  const enabled = configurationIssues.length === 0;
   res.json({
     clientId,
     sandbox: mode !== 'live',
     enabled,
     lkrToUsdRate: enabled ? LKR_TO_USD_RATE : null,
+    ...(enabled ? {} : { message: configurationIssues.join(' ') }),
   });
 });
 

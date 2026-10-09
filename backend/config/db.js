@@ -38,6 +38,7 @@ const connectDB = async () => {
 
   cachedPromise = mongoose.connect(uri)
     .then((conn) => {
+      cachedPromise = null;
       console.log(`MongoDB Connected: ${conn.connection.host}`);
       return conn;
     })
@@ -55,4 +56,3 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
-
