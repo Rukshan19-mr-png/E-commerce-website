@@ -1,6 +1,6 @@
 # Plantopia E-Commerce 🌿
 
-A premium MERN stack e-commerce platform for rare and endemic plants in Sri Lanka.
+A premium MERN stack e-commerce platform for rare and endemic plants in Sri Lanka
 
 ## Features
 - ✨ Premium UI with Glassmorphism
